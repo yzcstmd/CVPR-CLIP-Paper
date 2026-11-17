@@ -2,13 +2,65 @@
 \label{sec:calibration_ranking}
 
 \subsection{Ordinal Classification with Missing Grades}
-\label{sec:missing_grades}
-% TODO: Author-approved problem setup.
+
+Let $\mathcal Y=\{0,\ldots,K-1\}$ be an ordered grade space.
+Adaptation uses labeled images from the \emph{seen} grades $\mathcal O\subset\mathcal Y$, while the \emph{missing} grades $\mathcal U=\mathcal Y\setminus\mathcal O$ stay in the full-$K$ prediction space.
+A score vector $Z(x)\in\mathbb R^K$ predicts $\hat y(x)=\arg\max_k Z_k(x)$.
+For a missing grade $m$ and an adjacent seen grade $n$, the \emph{pair margin}
+\begin{equation}
+  g^{Z}_{mn}(x)=Z_m(x)-Z_n(x)
+  \label{eq:pair_margin}
+\end{equation}
+ranks images drawn from the two grades.
+Pair AUROC is the probability that an image of grade $m$ receives a larger margin than an image of grade $n$ (ties count one half), and MS-AUC averages it over adjacent missing--seen pairs.
+Full-$K$ decisions and pairwise ranking are two properties of the same scores, and they can come apart.
 
 \subsection{What Class-Bias Calibration Can and Cannot Change}
-\label{sec:class_bias_calibration}
-% TODO: Author-approved statement and scope.
+
+Post-hoc calibration adds an offset to the missing grades, $\operatorname{Cal}_c(Z)_k=Z_k+c\,\mathbf 1[k\in\mathcal U]$, as in calibrated stacking~\cite{chao2016gzsl}.
+With a single missing grade $m$, the decision statistic is $Z_m(x)-\max_{k\neq m}Z_k(x)$, and varying $c$ moves its threshold without changing the ranking of images.
+Calibration decides how many images qualify for the missing grade, not the order in which they qualify.
+The pairwise ranking is equally immune to calibration, including temperature scaling~\cite{guo2017calibration}.
+
+\begin{proposition}[Calibration preserves pairwise ranking]
+\label{prop:cal}
+Let $\widetilde Z(x)=aZ(x)+b$ with a shared scale $a>0$ and class biases $b\in\mathbb R^K$ independent of $x$.
+For every pair $(m,n)$, $g^{\widetilde Z}_{mn}$ and $g^{Z}_{mn}$ induce the same image ranking, the same ties, and the same pair AUROC.
+\end{proposition}
+
+\noindent\emph{Proof.}
+$g^{\widetilde Z}_{mn}(x)=a\,g^{Z}_{mn}(x)+b_m-b_n$ is strictly increasing in $g^{Z}_{mn}(x)$.\hfill$\square$
+
+Fig.~\ref{fig:teaser}c shows the consequence on real data: recall rises, while the pair AUROC does not move.
+To improve the order, the scores must change in an image-dependent way.
 
 \subsection{Reference--Displacement Analysis}
-\label{sec:reference_displacement}
-% TODO: Author-approved analysis; do not introduce a new acronym.
+
+We write the adapted scores as a zero-shot reference plus an adaptation displacement, $S(x)=T(x)+D(x)$ with $D=S-T$, so that every pair margin splits into two terms:
+\begin{equation}
+  g^{S}_{mn}(x)
+  =\underbrace{T_m(x)-T_n(x)}_{\Delta T_{mn}(x)}
+  +\underbrace{D_m(x)-D_n(x)}_{\Delta D_{mn}(x)}.
+  \label{eq:margin_decomposition}
+\end{equation}
+The split is an identity, but it locates the problem.
+The reference term $\Delta T_{mn}$ is fixed by the zero-shot model, so any ranking gain beyond zero-shot must come from $\Delta D_{mn}$.
+For a missing grade, however, $D_m$ was never fitted to images of grade $m$.
+
+A natural way to temper adaptation is to blend the adapted scores back toward the reference, $B_\lambda=T+\lambda D$, the output-space analogue of weight interpolation~\cite{wortsman2022robust}.
+Blending rescales the displacement of every grade; with calibration on top, it still reaches only one family of rankings.
+
+\begin{proposition}[Calibrated blending spans a one-parameter ranking family]
+\label{prop:family}
+Let $\widetilde B_\lambda=a(T+\lambda D)+b$ with $\lambda\ge0$, a shared scale $a>0$, and class biases $b\in\mathbb R^K$ independent of $x$.
+For every pair $(m,n)$, $\widetilde B_\lambda$ ranks images exactly as $\Delta T_{mn}+\lambda\,\Delta D_{mn}$ does, so the ranking depends on $\lambda$ alone.
+\end{proposition}
+
+\noindent\emph{Proof.}
+By \eqref{eq:margin_decomposition}, $g^{\widetilde B_\lambda}_{mn}=a(\Delta T_{mn}+\lambda\,\Delta D_{mn})+b_m-b_n$; apply Proposition~\ref{prop:cal}.\hfill$\square$
+
+Blending thus traces a single ranking path through the zero-shot ($\lambda=0$) and adapted ($\lambda=1$) models, with $\lambda>1$ extrapolating.
+Calibration leaves the ranking at each point of this path unchanged.
+The strength $\lambda$ controls how much of the original displacement is kept, never where the missing grade's displacement comes from.
+Section~\ref{sec:exp_matched} tests this family directly.
+We go beyond this path by transferring displacement from the missing grade's seen neighbors (Sec.~\ref{sec:tie}).

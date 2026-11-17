@@ -4,6 +4,9 @@
 
 % The upstream preamble and style files are preserved byte for byte.
 \input{preamble}
+% Author-defined mathematical environments; keep official sources unchanged.
+\usepackage{amsthm}
+\newtheorem{proposition}{Proposition}
 \definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
 \usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
 \hypersetup{pdfauthor={},pdftitle={Fixing the Score Is Not Fixing the Order:
