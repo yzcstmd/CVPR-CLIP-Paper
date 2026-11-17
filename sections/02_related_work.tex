@@ -14,7 +14,7 @@ TIE does not interpolate rank embeddings; it transfers image-dependent score dis
 
 \noindent\textbf{CLIP adaptation and generalization.}
 CLIP is commonly adapted with learned prompts~\cite{zhou2022coop,zhou2022cocoop,khattak2023maple} or with feature, cache, and residual adapters~\cite{gao2024clipadapter,zhang2022tipadapter,yu2023taskres}.
-TaskRes learns classifier residuals during adaptation; TIE operates on image-dependent score displacements after adaptation.
+TaskRes~\cite{yu2023taskres} learns classifier residuals during adaptation; TIE operates on image-dependent score displacements after adaptation.
 KgCoOp~\cite{yao2023kgcoop} regularizes learned prompt embeddings toward hand-crafted ones, whereas ProGrad~\cite{zhu2023prograd} constrains prompt updates using gradients aligned with zero-shot predictions.
 Base-to-novel benchmarks, however, treat novel classes as nominal and usually evaluate them apart from the base classes.
 Missing grades differ on both counts: they are predicted jointly with the seen grades, and they have adapted neighbors whose displacements can be inherited.
