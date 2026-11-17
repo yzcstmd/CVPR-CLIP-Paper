@@ -1,11 +1,58 @@
+% CVPR 2027 — Introduction v2, author-approved narrative.
+% Editorial edits relative to the supplied v2 are limited to:
+% (i) no unsupported claim of natural missing-grade frequency;
+% (ii) neighbor samples are not the missing-grade images themselves;
+% (iii) WiSE-FT is weight interpolation, not this score-space blend;
+% (iv) TIE is an additional-training-free operation on compatible scores;
+% (v) 59/64 refers to positive paired pointwise confidence intervals;
+% (vi) the best Blend is a shared-strength adapter-averaged grid maximum.
+% Figure 1 is inserted separately at the beginning of this section.
 \section{Introduction}
-\label{sec:introduction}
-% TODO: Author-approved introduction.
+\label{sec:intro}
+\input{fig/fig1_page2}
 
-% Author-supplied final PDF, copied byte for byte; no historical substitution.
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=\textwidth]{figures/fig1.pdf}
-  \caption{} % TODO: Author-approved caption; no scientific prose added in P0.
-  \label{fig:fig1}
-\end{figure*}
+Many visual recognition tasks are ordinal: a face belongs to an age group, a photograph to a decade, an image to a quality level.
+Vision--language models such as CLIP~\cite{radford2021clip} suit these tasks well, because every grade can be named in text, and prompt learning adapts them to a task with limited labeled data~\cite{zhou2022coop,zhou2022cocoop,li2022ordinalclip,wang2023l2rclip}.
+But limited labels do not always cover every grade.
+We study grades that are \emph{missing} from the adaptation set: they are unseen during adaptation, yet the deployed model must still predict them.
+CLIP keeps a text classifier for each missing grade, but adaptation can suppress their predictions~\cite{mai2024fine}: in Fig.~\ref{fig:teaser}, the adapted model does not recognize a single test image of the missing grade \emph{fair}.
+
+The standard diagnosis is miscalibration: adaptation inflates the scores of seen grades, and a class-wise offset should bring the missing ones back~\cite{chao2016gzsl,mai2024fine}.
+It does bring back predictions---calibration lifts the recall of \emph{fair} from 0\% to 22\%.
+It cannot bring back the order.
+Rank the test images of \emph{fair} and of its seen neighbor \emph{poor} by the margin between their two class scores.
+Any class-wise offset, even combined with a shared temperature, leaves this ranking exactly unchanged (Proposition~\ref{prop:cal}).
+The pair AUROC stays at 0.526, well below the 0.617 of the zero-shot model.
+Calibration changes how often a missing grade is predicted, not how its images are ordered.
+Fixing the score is not fixing the order.
+
+To see what is missing, we write the adapted score as a zero-shot reference plus an adaptation displacement, $S=T+D$.
+A missing grade keeps its reference $T_m$, but its displacement $D_m$ receives no direct supervision from images of that grade.
+Calibration only \emph{shifts} the missing grade's score by a constant.
+A related score-space alternative, motivated by model interpolation~\cite{wortsman2022robust}, \emph{scales} the displacements of all grades at once: $T+\lambda D$.
+This does change the order, but only along a single path through the zero-shot ($\lambda{=}0$) and adapted ($\lambda{=}1$) models, and calibrating the blend adds no new orders.
+Neither operation supplies the missing grade with the grade-specific adaptation it lacks.
+What matters is not merely how much adaptation is kept, but where the missing grade's displacement comes from.
+
+Ordinal label spaces offer a source that nominal ones do not.
+Nearby grades share task-relevant visual characteristics, and their displacements are adapted using labeled images from those seen grades.
+We propose \textbf{TIE}, which transfers this adaptation along the grade order: for every image, a missing grade inherits the displacement of its nearest seen grades while keeping its own zero-shot reference (Fig.~\ref{fig:teaser}b).
+TIE needs no additional training and operates on the scores of different CLIP adapters.
+It leaves every seen-grade score untouched, and at an endpoint grade it provably recovers the zero-shot order with its nearest seen neighbor.
+Calibration then sets the operating point: TIE repairs the order, and calibration fixes the score.
+
+We evaluate TIE on four ordinal benchmarks covering age, historical decade, and image quality, with nine adaptation configurations and six missing-grade patterns.
+With the same calibration protocol applied to both, TIE lowers the missing-grade and overall mean absolute error of the adapted model on all four benchmarks and improves missing--seen ranking (MS-AUC) for 34 of 36 adapter--dataset settings.
+Because TIE commutes with blending, we can also isolate its effect: at matched strength, the two paths share every seen-grade score and differ only in where the missing grade's displacement comes from (Fig.~\ref{fig:matched_strength}).
+Paired confidence intervals support a gain at 59 of 64 evaluated nonzero dataset--strength combinations.
+On three benchmarks, none of the 17 shared blending strengths---not even the best one, chosen on test performance---reaches TIE at the original strength in the adapter-averaged comparison.
+There, TIE also surpasses the zero-shot model, so its gain is transfer, not a return to zero-shot.
+The gain is largest when a grade has no labeled training images.
+
+Our contributions are threefold:
+\begin{itemize}
+  \item \textbf{Finding.} For grades missing from adaptation, calibration and ranking separate: class-wise calibration cannot reorder missing-grade images against their neighbors, and blending toward zero-shot moves this order only along a single path.
+  \item \textbf{Method.} We decompose adapted scores into a zero-shot reference and an adaptation displacement, and propose TIE, a training-free ordinal displacement transfer that preserves seen-grade scores and exactly recovers the zero-shot order at endpoint grades.
+  \item \textbf{Evidence.} Across four benchmarks, nine adaptation configurations, and six missing-grade patterns, TIE improves calibrated classification error and missing--seen ranking, outperforms blending in a controlled matched-strength comparison, and helps most when a grade has no supervision.
+\end{itemize}
+
