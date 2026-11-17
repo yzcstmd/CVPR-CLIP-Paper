@@ -1,0 +1,30 @@
+{
+  "official_remote_url": "https://github.com/cvpr-org/author-kit.git",
+  "tag": "CVPR2027-v1",
+  "commit_SHA": "a2369342011145be8c85e5ad21a9b61f9fa53473",
+  "acquisition_verified_at_UTC": "2026-11-17T05:33:23.134960+00:00",
+  "acquisition_method": "git clone --branch CVPR2027-v1 --single-branch; exact tag/commit verified",
+  "upstream_worktree_clean": true,
+  "byte_identical_files": {
+    "cvpr.sty": "ae8e51adc7270b118833b2092310ca1151a19fab0c09b1ab35a485ac4004ac0f",
+    "preamble.tex": "080e0bae5ff30626292192ee2b4d1afca432ed2d2c939486c1bb37856166f8c1",
+    "ieeenat_fullname.bst": "e38e6166bd7b1e6d23a1b79dcdb55c656e4fcdbe91bdf6b50d827e6b5d1aacfc"
+  },
+  "adapted_files": {
+    "main.tex": {
+      "upstream_SHA256": "391ada680eec864708cfbca25661ba47d95996c24fa349c9133afc9f3a222f96",
+      "changes": "Frozen title; anonymous author; sections; mandatory LLM section; safe bibliography and supplement switches; no sample content"
+    },
+    "main.bib": {
+      "upstream_SHA256": "1d6d78b4c02eae2607a40e15376f6ac96ef491e311241acd6c8a8a970ac3c1b2",
+      "changes": "Comment-only database; fictional example citations not reused"
+    }
+  },
+  "upstream_file_hash_manifest": "UPSTREAM_SHA256SUMS.txt",
+  "official_guidelines_url": "https://cvpr.thecvf.com/Conferences/2027/AuthorGuidelines",
+  "git_history_or_git_directory_copied": false,
+  "upstream_scripts_or_workflows_executed": false,
+  "local_compilation": "READY_FOR_OVERLEAF_COMPILE_NOT_LOCALLY_VERIFIED",
+  "guidelines_download_SHA256": "af16057e547477d5ee994a4ef614d0547ab859aae0113e17ce2e61e4af9fd8a1",
+  "guidelines_verified_at_UTC": "2026-11-17T05:36:38.853468+00:00"
+}

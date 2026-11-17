@@ -1,0 +1,51 @@
+% CVPR 2027 initialization skeleton, based on author-kit CVPR2027-v1.
+\documentclass[10pt,twocolumn,letterpaper]{article}
+\usepackage[review]{cvpr}
+
+% The upstream preamble and style files are preserved byte for byte.
+\input{preamble}
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
+\hypersetup{pdfauthor={},pdftitle={Fixing the Score Is Not Fixing the Order:
+Ordinal Transfer for Unseen Grades in CLIP}}
+
+\def\confName{CVPR}
+\def\confYear{2027}
+\title{Fixing the Score Is Not Fixing the Order:\\
+Ordinal Transfer for Unseen Grades in CLIP}
+\author{Anonymous Authors}
+
+% Enable only after adding author-verified references and actual citations.
+% Keeping this off avoids an empty BibTeX database run in the P0 skeleton.
+\newif\ifpaperhasreferences
+\paperhasreferencesfalse
+
+% Official supplementary-title mechanism; excluded from the main review PDF.
+\newif\ifincludesupplement
+\includesupplementfalse
+
+\begin{document}
+\maketitle
+\input{sections/00_abstract}
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_calibration_ranking}
+\input{sections/04_tie}
+\input{sections/05_experiments}
+\input{sections/06_conclusion}
+
+% Mandatory administrative section, after main text and before references.
+\input{sections/90_llm_usage_statement}
+
+\ifpaperhasreferences
+{
+    \small
+    \bibliographystyle{ieeenat_fullname}
+    \bibliography{main}
+}
+\fi
+
+\ifincludesupplement
+\input{supplementary/supplementary}
+\fi
+\end{document}

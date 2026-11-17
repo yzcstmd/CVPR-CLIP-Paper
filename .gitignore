@@ -1,0 +1,49 @@
+# Local build products
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb
+*.xdv
+/*.pdf
+/build/
+
+# Only author-confirmed final figure PDFs may be added later.
+/figures/*.pdf
+!/figures/fig1.pdf
+!/figures/fig2.pdf
+
+# Local receipts include server paths and are deliberately not published.
+/.local/
+/docs/P0_INITIALIZATION_REPORT.md
+
+# Research assets and secrets are outside this paper-source repository.
+/data/
+/datasets/
+/outputs/
+/checkpoints/
+*.csv
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.pptx
+.env
+.env.*
+auth.json
+*.pem
+*.key
+__pycache__/
+.DS_Store
