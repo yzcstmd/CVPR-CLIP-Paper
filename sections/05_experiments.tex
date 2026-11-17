@@ -28,6 +28,12 @@ We normalize validation error by the grade range:
 \]
 All deployment choices use validation data only.
 
+\noindent\textbf{Implementation details.}
+KonIQ grades are MOS quintiles with training-split cut points 2.70, 3.14, 3.42, and 3.64, named \emph{bad}, \emph{poor}, \emph{fair}, \emph{good}, and \emph{excellent} in the template ``a photograph with \{grade\} image quality.''; the zero-shot reference $T$ uses the same template without learned components.
+The CoOp-style configuration learns $M=4$ context tokens with both encoders frozen.
+When four of the five KonIQ grades are seen, the 256 training images give 64 per seen grade (Fig.~\ref{fig:teaser}a).
+Templates for the other tasks are listed in the supplement.
+
 \noindent\textbf{Metrics.}
 MS-AUC averages the pair AUROC of Sec.~\ref{sec:calibration_ranking} over adjacent missing--seen pairs.
 Missing MAE averages the per-grade MAE over missing grades; Seen and Overall MAE average over seen and all test images, in grade units.
@@ -124,6 +130,7 @@ $\Delta$
 \setcounter{table}{1}
 
 Table~\ref{tab:main} shows that under matched calibration, TIE+C improves both ranking and full-$K$ classification. Relative to Adapted+C, it raises MS-AUC on all four tasks by 0.039--0.062, while reducing Missing MAE by 0.020--0.099 and Overall MAE by 0.008--0.026. Seen MAE also decreases on every task. Adapted and Adapted+C have identical MS-AUC, as Proposition~\ref{prop:cal} predicts: class-bias calibration changes decisions, not fixed-pair ranking.
+TIE also lightens the calibration burden: in the KonIQ example of Fig.~\ref{fig:teaser}, the selected offset falls from $c^*=6$ for the adapted model to $c^*=0$ after TIE, because the inherited displacement already lifts the images of the missing grade.
 
 Validation-selected blending barely changes the observed ranking: both Blend selectors stay within 0.007 MS-AUC of Adapted on every task. Seen-only validation does not directly optimize missing--seen ranking. TIE+C achieves higher MS-AUC and lower Overall MAE than both Blend variants on all four tasks, and lower Missing MAE than Blend-A+C on all four. On HCI, Blend-S+C attains lower Missing MAE (1.247 versus 1.284), while TIE+C yields lower Overall MAE and higher MS-AUC. Section~\ref{sec:exp_matched} tests whether changing the blending strength itself can close the ranking gap.
 
@@ -139,6 +146,31 @@ Because MS-AUC is invariant to class-bias calibration (Proposition~\ref{prop:cal
 Because the inheritance operator is linear, TIE commutes with blending (Proposition~\ref{prop:tie_structure}). The matched-strength comparison therefore isolates the source of displacement: TIE and Blend share every seen-grade score at a given $\lambda$ and differ only in the missing grades' displacement (Fig.~\ref{fig:matched_strength}). This ranking-only analysis uses three interior mask families, with 81 conditions per dataset.
 
 TIE obtains ranking gains supported by positive paired 95\% intervals at all 16 nonzero strengths on FairFace and KonIQ, at 14 of 16 strengths on Adience, and at 13 of 16 on HCI---59 of 64 comparisons in total. At $\lambda=1$, TIE improves MS-AUC by 0.038--0.069, with positive point estimates in 35 of 36 interior adapter--dataset settings.
+
+Table~\ref{tab:matched} lists the values behind Fig.~\ref{fig:matched_strength}.
+At $\lambda=1$, the paired intervals of TIE$-$Blend are $[0.024,0.046]$, $[0.034,0.066]$, $[0.058,0.064]$, and $[0.057,0.080]$ on Adience, HCI, FairFace, and KonIQ.
+The five intervals that are not positive all occur at the smallest strengths (0.1 and 0.2 on Adience; 0.1--0.3 on HCI), where both paths remain close to zero-shot; from $\lambda=0.4$ on, TIE's interval is positive on every benchmark.
+
+% Preserve Tables 1--4 while assigning the new matched-strength table number 5.
+\setcounter{table}{4}
+\begin{table}[t]
+\centering
+\caption{\textbf{Matched-strength summary.} Interior-grade MS-AUC behind Fig.~\ref{fig:matched_strength}: zero-shot ($\lambda{=}0$), the adapted model and TIE at the original strength ($\lambda{=}1$), the best Blend on the 17-point grid with its strength, and the number of nonzero strengths at which the paired 95\% interval of TIE$-$Blend is positive. Bold: TIE at $\lambda{=}1$ above the best Blend.}
+\label{tab:matched}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lccccc@{}}
+\toprule
+Dataset & Zero-shot & Adapted & TIE & Best Blend ($\lambda$) & $k/16$ \\
+\midrule
+Adience  & 0.916 & 0.867 & 0.906          & 0.918 (0.1) & 14 \\
+HCI      & 0.628 & 0.692 & \textbf{0.742} & 0.700 (0.5) & 13 \\
+FairFace & 0.792 & 0.756 & \textbf{0.817} & 0.800 (0.2) & 16 \\
+KonIQ    & 0.539 & 0.566 & \textbf{0.635} & 0.568 (0.6) & 16 \\
+\bottomrule
+\end{tabular*}
+\end{table}
+\setcounter{table}{1}
 
 More importantly, tuning the blending strength cannot close the observed gap on three benchmarks. Proposition~\ref{prop:family} shows that global blending traces a one-parameter ranking family. We compare TIE at $\lambda=1$ with the maximum of the adapter-averaged Blend curve over all 17 tested strengths, allowing one shared strength per benchmark to be selected retrospectively on test data. TIE exceeds this best Blend result on HCI, FairFace, and KonIQ by 0.042, 0.018, and 0.067, respectively. It also exceeds the zero-shot reference on those benchmarks by 0.113, 0.025, and 0.096.
 
@@ -184,6 +216,11 @@ TIE on top of KgCoOp raises MS-AUC on all four tasks, by 0.030--0.157, although 
 Transferring displacements rather than scores keeps each missing grade's own reference (Sec.~\ref{sec:tie}).
 Equal-weight and distance-weighted inheritance coincide for an isolated interior grade and differ only for missing blocks.
 The supplement compares these variants with direct score interpolation and one-sided inheritance, and splits the inheritance error of Proposition~\ref{prop:tie_error} into its constant and image-dependent parts.
+
+\noindent\textbf{Why fixed weights.}
+Learning inheritance weights would require images of the missing grade, which by construction are unavailable, so TIE fixes them.
+Proposition~\ref{prop:tie_error} shows when this costs nothing: equal weights are exact wherever adaptation varies linearly across adjacent grades, and only image-dependent curvature can alter the ranking.
+Fixed weights also leave TIE without hyperparameters, so every gain reported here is obtained without tuning on missing-grade data.
 
 % =========================================================
 % TABLE 2 — SINGLE-COLUMN CONTROLS
@@ -250,5 +287,5 @@ Domain & SCUT-FBP5500 & CoOp & $+$0.120 & $-$0.059 \\
 \end{tabular*}
 \end{table}
 
-% Continue after the four main tables if the optional supplement is enabled.
-\setcounter{table}{4}
+% Continue after the five main tables if the optional supplement is enabled.
+\setcounter{table}{5}
