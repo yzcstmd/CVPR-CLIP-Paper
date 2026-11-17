@@ -1,3 +1,16 @@
 \section{Conclusion and Limitations}
 \label{sec:conclusion}
-% TODO: Author-approved conclusion and compact limitations paragraph.
+
+For grades unseen during adaptation, fixing the score and fixing the order are different problems.
+Class-bias calibration changes how often a missing grade is predicted but provably cannot change its image ranking against a fixed seen grade.
+Blending toward the zero-shot model moves that order only along a single path.
+What the missing grade lacks is an adaptation of its own.
+TIE supplies one from the grade order: each missing grade inherits the image-dependent displacement of its seen neighbors while keeping its own zero-shot reference, without training and without touching seen-grade scores.
+Across four benchmarks and nine adapter configurations, TIE lowers calibrated missing-grade and overall error, improves missing--seen ranking in 34 of 36 adapter--dataset pairs, and on three benchmarks surpasses the best evaluated global Blend.
+More broadly, when a label space is ordered, a class missing from adaptation need not be treated as a calibration problem: its neighbors' adaptation can be transferred.
+
+\noindent\textbf{Limitations.}
+TIE assumes that adjacent grades share visual evidence; where appearance changes abruptly between grades, or the zero-shot reference is weak, inheritance can help less.
+At an endpoint grade, TIE recovers, but cannot exceed, the zero-shot order with the nearest seen grade.
+Better ranking does not always yield lower calibrated error, and our missing grades come from controlled masks rather than naturally rare grades.
+Learning when and from where to inherit displacement is a natural next step.
