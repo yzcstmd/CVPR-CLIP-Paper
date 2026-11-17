@@ -6,8 +6,8 @@ Class-bias calibration changes how often a missing grade is predicted but provab
 Blending toward the zero-shot model moves that order only along a single path.
 What the missing grade lacks is an adaptation of its own.
 TIE supplies one from the grade order: each missing grade inherits the image-dependent displacement of its seen neighbors while keeping its own zero-shot reference, without training and without touching seen-grade scores.
-Across four benchmarks and nine adapter configurations, TIE lowers calibrated missing-grade and overall error, improves missing--seen ranking in 34 of 36 adapter--dataset pairs, and on three benchmarks surpasses the best evaluated global Blend.
-More broadly, when a label space is ordered, a class missing from adaptation need not be treated as a calibration problem: its neighbors' adaptation can be transferred.
+Across four benchmarks and nine adapter configurations, TIE lowers calibrated missing-grade and overall error, improves missing--seen ranking in 34 of 36 adapter--dataset settings, and on three benchmarks surpasses the best evaluated global Blend.
+More broadly, when a label space is ordered, a class missing from adaptation need not be treated only as a calibration problem: its neighbors' adaptation can be transferred.
 
 \noindent\textbf{Limitations.}
 TIE assumes that adjacent grades share visual evidence; where appearance changes abruptly between grades, or the zero-shot reference is weak, inheritance can help less.

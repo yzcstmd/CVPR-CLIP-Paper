@@ -1,0 +1,23 @@
+\begin{table}[t]
+\centering
+\caption{\textbf{Ranking gains across adapter configurations.}
+Change in MS-AUC from Adapted to TIE on the four primary benchmarks, averaged over six missing-grade masks and three seeds per configuration. Differences are computed before rounding; positive values indicate improved missing--seen ranking.}
+\label{tab:adapter_delta}
+\footnotesize
+\setlength{\tabcolsep}{2.3pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrrr@{}}
+\toprule
+Configuration & Adience & HCI & FairFace & KonIQ \\
+\midrule
+CoOp-style & +0.047 & +0.051 & +0.037 & +0.081 \\
+OrdinalCLIP-style & +0.162 & +0.075 & +0.105 & +0.055 \\
+KgCoOp-style (legacy) & +0.023 & +0.019 & +0.017 & +0.071 \\
+TaskRes-style (CE) & +0.035 & +0.031 & +0.089 & +0.057 \\
+TaskRes-style (SORD) & +0.010 & +0.001 & +0.014 & +0.015 \\
+Tip-Adapter-F (CE) & +0.085 & +0.055 & +0.105 & +0.072 \\
+Tip-Adapter-F (SORD) & +0.077 & +0.052 & +0.087 & +0.070 \\
+M3 & +0.028 & +0.030 & +0.092 & +0.085 \\
+TEXT\_ONLY & -0.002 & +0.037 & -0.011 & +0.055 \\
+\bottomrule
+\end{tabular*}
+\end{table}

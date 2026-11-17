@@ -3,7 +3,8 @@
 
 \subsection{Ordinal Classification with Missing Grades}
 
-Let $\mathcal Y=\{0,\ldots,K-1\}$ be an ordered grade space.
+Let $\mathcal Y=\{1,\ldots,K\}$ be an ordered grade space.
+We use \emph{grade} to mean an ordered class and index grades from $1$ to $K$ throughout the paper.
 Adaptation uses labeled images from the \emph{seen} grades $\mathcal O\subset\mathcal Y$, while the \emph{missing} grades $\mathcal U=\mathcal Y\setminus\mathcal O$ stay in the full-$K$ prediction space.
 A score vector $Z(x)\in\mathbb R^K$ predicts $\hat y(x)=\arg\max_k Z_k(x)$.
 For a missing grade $m$ and an adjacent seen grade $n$, the \emph{pair margin}
@@ -24,7 +25,7 @@ The pairwise ranking is equally immune to calibration, including temperature sca
 
 \begin{proposition}[Calibration preserves pairwise ranking]
 \label{prop:cal}
-Let $Z'(x)=aZ(x)+b$, where $a>0$ is shared across grades and $b\in\mathbb R^K$ is independent of $x$.
+Let $Z'(x)=aZ(x)+b$, where the scalar $a>0$ and vector $b\in\mathbb R^K$ do not depend on $x$.
 For every pair $(m,n)$, the margins $g_{mn}^{Z'}$ and $g_{mn}^{Z}$ induce the same image ranking, the same ties, and the same pair AUROC.
 \end{proposition}
 
@@ -37,15 +38,14 @@ To improve the order, the scores must change in an image-dependent way.
 
 \subsection{Reference--Displacement Analysis}
 
-We write the adapted scores as a zero-shot reference plus an adaptation displacement, $S(x)=T(x)+D(x)$ with $D=S-T$, so that every pair margin splits into two terms:
+We write adapted scores as $S(x)=T(x)+D(x)$, where $T$ is the zero-shot reference and $D=S-T$ is the adaptation displacement.
+Let $\Delta T_{mn}(x)=T_m(x)-T_n(x)$ and $\Delta D_{mn}(x)=D_m(x)-D_n(x)$.
+The adapted pair margin is
 \begin{equation}
-  g^{S}_{mn}(x)
-  =\underbrace{T_m(x)-T_n(x)}_{\Delta T_{mn}(x)}
-  +\underbrace{D_m(x)-D_n(x)}_{\Delta D_{mn}(x)}.
+  g^S_{mn}(x)=\Delta T_{mn}(x)+\Delta D_{mn}(x).
   \label{eq:margin_decomposition}
 \end{equation}
-The split is an identity, but it locates the problem.
-The reference term $\Delta T_{mn}$ is fixed by the zero-shot model, so any ranking gain beyond zero-shot must come from $\Delta D_{mn}$.
+The zero-shot reference is fixed; adaptation changes pairwise margins through $\Delta D_{mn}$.
 For a missing grade, however, $D_m$ was never fitted to images of grade $m$.
 
 A natural way to temper adaptation is to blend the adapted scores back toward the reference, $B_\lambda=T+\lambda D$, the output-space analogue of weight interpolation~\cite{wortsman2022robust}.

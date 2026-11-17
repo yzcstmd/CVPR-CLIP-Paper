@@ -6,21 +6,33 @@
 
 \noindent\textbf{Tasks.}
 We use four ordinal benchmarks: Adience~\cite{eidinger2014age} ($K{=}8$ age groups), FairFace~\cite{karkkainen2021fairface} ($K{=}9$ age groups), HCI~\cite{palermo2012dating} ($K{=}5$ decades), and KonIQ-10k~\cite{hosu2020koniq} ($K{=}5$ quality grades from mean-opinion-score quintiles, with cut points fixed on the training split).
-Each task is evaluated under six missing-grade patterns: a low, middle, or high grade; two adjacent grades; two separated grades; or both endpoints.
+We evaluate six missing-grade masks: the lowest grade, a middle grade, the highest grade, two adjacent interior grades, two nonadjacent interior grades, and both endpoints.
+The three interior-mask families are the middle-grade, adjacent-interior, and nonadjacent-interior cases.
 All $K$ grades remain in the test label space.
 
 \noindent\textbf{Adaptation and baselines.}
 All main experiments use OpenAI CLIP ViT-B/16~\cite{radford2021clip} with nine adapter configurations covering prompt, ordinal, residual, and cache-based adaptation (details in the supplement), each trained with three seeds, for $9\times4\times6\times3=648$ conditions.
+The nine configurations are CoOp-style, OrdinalCLIP-style (frozen image encoder), KgCoOp-style (legacy), TaskRes-style (CE/SORD), Tip-Adapter-F (CE/SORD), M3, and TEXT\_ONLY.
 Each run uses 256 training images in total from the seen grades and 64 seen-grade validation images in total.
-We compare zero-shot CLIP; the adapted model without and with calibration (Adapted, Adapted+C); two validation-selected global blends with calibration, which choose the blending strength before (Blend-S+C) or jointly with (Blend-A+C) the offset; and TIE+C.
-Every calibrated method selects its own largest feasible offset from the registered candidate grid under one common budget: seen-validation nMAE may exceed that of uncalibrated Adapted by at most $\delta=0.005$.
-All deployment choices use validation data only; a binary-score control is reported in the supplement.
+We compare zero-shot CLIP; the adapted model without and with calibration (Adapted, Adapted+C); two validation-selected global blends with calibration (Blend-S+C, Blend-A+C); and TIE+C.
+The suffix $+$C denotes post-hoc class-bias calibration, written $+$Cal.\ in Fig.~\ref{fig:teaser}.
+Blend-S+C selects a blending strength and then calibrates it.
+Blend-A+C calibrates each candidate strength under the same validation budget and then selects a strength using the registered validation objective.
+Each calibrated method selects the largest feasible missing-grade bias on seen-only validation, subject to an nMAE increase of at most $\delta=0.005$ over uncalibrated Adapted.
+We normalize validation error by the grade range:
+\[
+\mathrm{nMAE}_{\mathrm{seen}}
+=\frac{1}{N_{\mathrm{val}}(K-1)}
+\sum_{i=1}^{N_{\mathrm{val}}}|\hat y_i-y_i|.
+\]
+All deployment choices use validation data only.
 
 \noindent\textbf{Metrics.}
 MS-AUC averages the pair AUROC of Sec.~\ref{sec:calibration_ranking} over adjacent missing--seen pairs.
 Missing MAE averages the per-grade MAE over missing grades; Seen and Overall MAE average over seen and all test images, in grade units.
 Results are averaged over masks and seeds within each adapter--dataset setting, then equally over the nine adapters.
 Confidence intervals are paired 95\% bootstrap intervals over test groups with fixed checkpoints.
+Intervals use paired resampling of the same held-out test groups for the two compared methods, conditional on their fitted checkpoints.
 
 % =========================================================
 % TABLE 1 — MAIN RESULTS
@@ -30,7 +42,10 @@ Confidence intervals are paired 95\% bootstrap intervals over test groups with f
 \centering
 \caption{\textbf{Full-$K$ ordinal grading under matched calibration.}
 Means over nine adapter configurations, six missing-grade patterns, and three seeds.
-AUC: MS-AUC ($\uparrow$); Miss., Seen, All: MAE over missing-grade, seen-grade, and all test images, in grade units ($\downarrow$).
+AUC: MS-AUC ($\uparrow$); MAE in grade units ($\downarrow$).
+Miss.: grade-macro MAE over missing grades;
+Seen and All: image-averaged MAE over seen and all test images.
+All differences are computed from unrounded values.
 +C: offset selected on seen-grade validation images under the same budget for every method.
 Blend-S/-A: validation-selected global blending, with the strength chosen before or jointly with calibration.
 Top block: uncalibrated references.
@@ -103,35 +118,22 @@ $\Delta$
 \subsection{Main Results under Matched Calibration}
 \label{sec:exp_main}
 
-Table~\ref{tab:main} asks the practical question: once every method is calibrated by the same protocol, does ordinal transfer improve full-$K$ grading?
-It does.
-Relative to Adapted+C, TIE+C raises MS-AUC on all four tasks by 0.039--0.062, and lowers Missing MAE by 0.020--0.099 and Overall MAE by 0.008--0.026.
-Seen MAE decreases on every task as well, and the ranking gain holds for 34 of 36 adapter--dataset pairs.
-Adapted and Adapted+C have identical MS-AUC, as Proposition~\ref{prop:cal} predicts: calibration moves decisions, not the order.
+Table~\ref{tab:main} shows that under matched calibration, TIE+C improves both ranking and full-$K$ grading. Relative to Adapted+C, it raises MS-AUC on all four tasks by 0.039--0.062, while reducing Missing MAE by 0.020--0.099 and Overall MAE by 0.008--0.026. Seen MAE also decreases on every task. MS-AUC improves in 34 of 36 adapter--dataset settings. Adapted and Adapted+C have identical MS-AUC, as Proposition~\ref{prop:cal} predicts: class-bias calibration changes decisions, not fixed-pair ranking.
 
-Global blending is a strong baseline in principle, but not in deployment.
-Validation-selected Blend stays within 0.007 MS-AUC of Adapted on every task.
-Seen-only validation selects for seen-grade performance and does not directly optimize missing--seen ranking.
-TIE+C therefore achieves higher MS-AUC and lower Overall MAE than both Blend variants on all four tasks, and lower Missing MAE than Blend-A+C on all four.
-Blend-S+C reaches a lower Missing MAE on HCI (1.247 vs.\ 1.284), at the cost of higher Overall MAE.
-Section~\ref{sec:exp_matched} asks whether any blending strength, even one chosen with test labels, could close the gap.
+Validation-selected blending barely changes the observed ranking: both Blend selectors stay within 0.007 MS-AUC of Adapted on every task. Seen-only validation does not directly optimize missing--seen ranking. TIE+C achieves higher MS-AUC and lower Overall MAE than both Blend variants on all four tasks, and lower Missing MAE than Blend-A+C on all four. On HCI, Blend-S+C attains lower Missing MAE (1.247 versus 1.284), while TIE+C yields lower Overall MAE and higher MS-AUC. Section~\ref{sec:exp_matched} tests whether changing the blending strength itself can close the ranking gap.
+
+Table~\ref{tab:adapter_delta} resolves the aggregate gain by adapter configuration. TIE improves missing--seen ranking in 34 of 36 adapter--dataset settings, with gains across prompt, ordinal, residual, and cache-based adaptation. The two nonpositive settings belong to the TEXT\_ONLY configuration on Adience and FairFace.
 
 \subsection{Ordinal Transfer beyond Global Blending}
 \label{sec:exp_matched}
 
-Because TIE is linear, it commutes with blending (Proposition~\ref{prop:tie_structure}), so the two can be compared at matched strength in a controlled intervention: at every $\lambda$ they share all seen-grade scores and differ only in where the missing grade's displacement comes from (Fig.~\ref{fig:matched_strength}).
-This analysis uses the three interior patterns (81 conditions per dataset) and measures ranking only.
-Under pointwise paired intervals, TIE improves missing--seen ranking at all 16 nonzero strengths on FairFace and KonIQ and at 14 and 13 of 16 on Adience and HCI; the only negative interval is HCI at $\lambda=0.1$.
-At $\lambda=1$, TIE gains 0.038--0.069 MS-AUC, with positive point estimates in 35 of 36 interior adapter--dataset settings.
-More importantly, tuning the strength does not close the gap.
-By Proposition~\ref{prop:family}, calibrated blending moves along a single path of rankings; let the best Blend be the maximum of its adapter-averaged curve over the 17 evaluated strengths---a single $\lambda$ shared by all configurations and selected retrospectively on the test results.
-On HCI, FairFace, and KonIQ, TIE at $\lambda=1$ still exceeds it by 0.042, 0.018, and 0.067, and exceeds the zero-shot reference by 0.113, 0.025, and 0.096: the gain is transfer, not a return to zero-shot.
-Adience shows the complementary regime: zero-shot already ranks age well, the best Blend ($\lambda=0.1$) stays slightly above TIE at $\lambda=1$, and TIE instead recovers 79\% of the ranking lost to adaptation and degrades three times more slowly with $\lambda$.
-The key is not merely how much adaptation is retained, but where the missing grade's displacement comes from.
+Because the inheritance operator is linear, TIE commutes with blending (Proposition~\ref{prop:tie_structure}). The matched-strength comparison therefore isolates the source of displacement: TIE and Blend share every seen-grade score at a given $\lambda$ and differ only in the missing grades' displacement (Fig.~\ref{fig:matched_strength}). This ranking-only analysis uses three interior mask families, with 81 conditions per dataset.
 
-% =========================================================
-% FIGURE 2 — EXISTING FROZEN ARTIFACT
-% =========================================================
+TIE obtains ranking gains supported by positive paired 95\% intervals at all 16 nonzero strengths on FairFace and KonIQ, at 14 of 16 strengths on Adience, and at 13 of 16 on HCI---59 of 64 comparisons in total. At $\lambda=1$, TIE improves MS-AUC by 0.038--0.069, with positive point estimates in 35 of 36 interior adapter--dataset settings.
+
+More importantly, tuning the blending strength cannot close the observed gap on three benchmarks. Proposition~\ref{prop:family} shows that global blending traces a one-parameter ranking family. We compare TIE at $\lambda=1$ with the maximum of the adapter-averaged Blend curve over all 17 tested strengths, allowing one shared strength per benchmark to be selected retrospectively on test data. TIE exceeds this best Blend result on HCI, FairFace, and KonIQ by 0.042, 0.018, and 0.067, respectively. It also exceeds the zero-shot reference on those benchmarks by 0.113, 0.025, and 0.096.
+
+Adience presents a different regime: its zero-shot model already provides strong ranking, and the best tested Blend at $\lambda=0.1$ remains slightly above TIE at the original strength. Nevertheless, TIE recovers 79\% of the ranking lost through adaptation. From $\lambda=0$ to $2$, its MS-AUC decreases by only 0.030, compared with 0.097 for Blend. The key is not merely how much adaptation is retained, but where a missing grade's displacement comes from.
 
 \begin{figure*}[t]
 \centering
@@ -145,24 +147,25 @@ The key is not merely how much adaptation is retained, but where the missing gra
 \label{sec:exp_structure}
 
 \noindent\textbf{Endpoints versus interior grades.}
-The endpoint guarantee of Proposition~\ref{prop:tie_structure} is not vacuous: on endpoint patterns, adaptation lowers MS-AUC below zero-shot on all four tasks, by 0.065, 0.028, 0.058, and 0.056 on Adience, HCI, FairFace, and KonIQ, and TIE restores the zero-shot ranking exactly.
-On interior patterns TIE goes further and exceeds zero-shot on three tasks (Sec.~\ref{sec:exp_matched}), so neighbors contribute task information that the zero-shot model lacks.
+Endpoint recovery repairs a measurable adaptation loss. On endpoint patterns, adaptation lowers MS-AUC below zero-shot by 0.065, 0.028, 0.058, and 0.056 on Adience, HCI, FairFace, and KonIQ, respectively. TIE exactly restores the zero-shot margin for each missing endpoint and its nearest seen grade. On interior patterns, TIE goes further and exceeds zero-shot on HCI, FairFace, and KonIQ (Sec.~\ref{sec:exp_matched}), showing that the neighbors contribute task information beyond the zero-shot reference.
 
 \noindent\textbf{Grade-specific supervision.}
-Transfer helps most where it is needed most.
+Transfer gains shrink as missing-grade supervision grows.
 In two support studies, one fixing the total training budget and the other fixing the seen-grade images, the average ranking gain of TIE decreases monotonically as missing-grade support grows from 0\% to 10\% to 20\%, in all 18 method--task--protocol summaries.
-Inheritance is most valuable exactly when a grade has no images of its own.
 
-\noindent\textbf{How much: a full-support reference.}
+\noindent\textbf{Full-support reference.}
 Table~\ref{tab:controls}a compares TIE with FullSup, a budget-matched model adapted on all grades.
 Without a single image of the missing grade, TIE closes 44--58\% of the Missing-MAE gap on three tasks and more than the whole gap on KonIQ, where it beats FullSup for eight of nine adapters.
 FullSup is an empirical reference rather than an upper bound, because it spreads the same budget over more grades.
 
 \noindent\textbf{Knowledge preservation is not order preservation.}
 KgCoOp~\cite{yao2023kgcoop} keeps learned prompts close to zero-shot knowledge.
-On HCI, it improves Missing MAE over CoOp by 0.074 yet lowers MS-AUC by 0.118 (Table~\ref{tab:controls}b): it fixes the score at the expense of the order.
+On HCI, it improves Missing MAE over CoOp by 0.074 yet lowers MS-AUC by 0.118 (Table~\ref{tab:controls}b): it improves missing-grade error while reducing missing--seen ranking performance.
 TIE on top of KgCoOp raises MS-AUC on all four tasks, by 0.030--0.157, although its calibrated Missing MAE is higher than KgCoOp's on three of them.
-The supplement compares TIE with direct score interpolation and with distance-weighted and one-sided variants, and splits the inheritance error of Proposition~\ref{prop:tie_error} into its constant and image-dependent parts.
+
+\noindent\textbf{Inheritance operators.}
+TIE transfers adaptation displacement while retaining the missing grade's own reference, unlike direct interpolation of adapted scores. Equal-weight inheritance coincides with the corresponding midpoint rule for isolated interior grades, while distance-weighted variants differ on missing blocks. The operator comparisons show that the transfer rule matters, especially when several adjacent grades are absent.
+The full-support diagnostic further separates constant displacement error from the image-dependent component that can change pairwise ranking.
 
 % =========================================================
 % TABLE 2 — SINGLE-COLUMN CONTROLS
@@ -172,12 +175,12 @@ The supplement compares TIE with direct score interpolation and with distance-we
 \centering
 \caption{\textbf{Supervision and training-time controls.}
 (a) Uncalibrated Missing MAE of Adapted, TIE, and a budget-matched full-support model (FullSup); Closed: share of the Adapted--FullSup gap closed by TIE, averaged over the nine adapters.
-(b) KgCoOp-style adaptation on two interior patterns: change from CoOp, and the MS-AUC gain of TIE applied on top of KgCoOp.}
+(b) KgCoOp (formula-matched) adaptation on two interior patterns: change from CoOp, and the MS-AUC gain of TIE applied on top of KgCoOp.}
 \label{tab:controls}
 \small
 \setlength{\tabcolsep}{4pt}
 \textit{(a) Full-support reference}\par\vspace{2pt}
-\begin{tabular}{@{}lcccc@{}}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrrr@{}}
 \toprule
 Dataset & Adapted$\downarrow$ & TIE$\downarrow$ & FullSup$\downarrow$ & Closed \\
 \midrule
@@ -186,10 +189,10 @@ HCI & 1.377 & 1.052 & 0.642 & 44\% \\
 FairFace & 1.071 & 0.696 & 0.417 & 56\% \\
 KonIQ & 1.446 & 0.883 & 0.938 & 111\% \\
 \bottomrule
-\end{tabular}
+\end{tabular*}
 \par\vspace{6pt}
 \textit{(b) KgCoOp: knowledge preservation vs.\ order}\par\vspace{2pt}
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrr@{}}
 \toprule
 & \multicolumn{2}{c}{KgCoOp $-$ CoOp} & TIE on KgCoOp \\
 \cmidrule(lr){2-3}\cmidrule(l){4-4}
@@ -200,28 +203,23 @@ HCI & $-$0.118 & $-$0.074 & $+$0.157 \\
 FairFace & $-$0.004 & $-$0.001 & $+$0.045 \\
 KonIQ & $-$0.005 & $-$0.013 & $+$0.055 \\
 \bottomrule
-\end{tabular}
+\end{tabular*}
 \end{table}
 
 \subsection{Generality}
 \label{sec:exp_generality}
 
-Table~\ref{tab:extensions} varies one factor at a time, each within its own protocol.
-TIE raises MS-AUC with LAION-pretrained weights~\cite{cherti2023reproducible} on Adience and HCI, with a ResNet-50 backbone on HCI, and on a new task, facial-beauty grading on SCUT-FBP5500~\cite{liang2018scut}, for both CoOp and OrdinalCLIP-style adaptation (by 0.120 and 0.188).
-With full fine-tuning of the visual encoder, it raises MS-AUC on HCI, FairFace, and KonIQ by 0.008, 0.010, and 0.199, and leaves Adience essentially unchanged ($-0.006$).
-On diabetic-retinopathy grading (DDR~\cite{li2019ddr}), TIE lowers Missing MAE under all three backbones tested, but its ranking effect is mixed across backbones (supplement).
+Table~\ref{tab:extensions} extends TIE across pretraining sources, backbones, and grading domains, with results reported under their respective protocols. TIE improves MS-AUC with LAION-pretrained weights~\cite{cherti2023reproducible} on Adience and HCI, with a ResNet-50 backbone on HCI, and on SCUT-FBP5500 facial-attractiveness grading~\cite{liang2018scut}. The SCUT gains are 0.120 for CoOp-style adaptation and 0.188 for OrdinalCLIP-style adaptation.
 
-% =========================================================
-% TABLE 3 — SINGLE-COLUMN EXTENSIONS
-% =========================================================
+With full fine-tuning of the image encoder and classification head, TIE raises MS-AUC on HCI, FairFace, and KonIQ by 0.008, 0.010, and 0.199, respectively; the change on Adience is $-0.006$. On diabetic-retinopathy grading (DDR~\cite{li2019ddr}), TIE lowers Missing MAE with all three evaluated backbones, while ranking changes differ across backbones.
 
 \begin{table}[t]
 \centering
-\caption{\textbf{Generality.} TIE minus Adapted, both uncalibrated, within each extension protocol (not pooled with Table~\ref{tab:main}). $\Delta$AUC: MS-AUC; $\Delta$Miss.: Missing MAE. SCUT-FBP5500 uses its five official folds.}
+\caption{\textbf{Generality.} TIE minus Adapted, both uncalibrated, within each extension protocol (not pooled with Table~\ref{tab:main}). $\Delta$AUC: MS-AUC; $\Delta$Miss.: Missing MAE. SCUT-FBP5500 uses its five official folds. CoOp-style and OrdinalCLIP-style denote the matched-protocol implementations used in these extensions.}
 \label{tab:extensions}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}lllcc@{}}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lllrr@{}}
 \toprule
 Factor & Setting & Adapter & $\Delta$AUC$\uparrow$ & $\Delta$Miss.$\downarrow$ \\
 \midrule
@@ -231,5 +229,8 @@ Backbone & RN50, HCI & CoOp & $+$0.071 & $-$0.237 \\
 Domain & SCUT-FBP5500 & CoOp & $+$0.120 & $-$0.059 \\
 & SCUT-FBP5500 & OrdinalCLIP & $+$0.188 & $-$0.083 \\
 \bottomrule
-\end{tabular}
+\end{tabular*}
 \end{table}
+
+% Author-approved Table 4, verified against all 648 saved paired points.
+\input{tables/04_adapter_delta}

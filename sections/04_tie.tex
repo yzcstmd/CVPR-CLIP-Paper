@@ -34,17 +34,20 @@ The operator copies seen coordinates, giving (i). At a missing endpoint, the dis
 
 These properties have direct consequences. Seen--seen comparisons remain exactly as adapted. The specified endpoint--neighbor margin returns to its zero-shot value. At matched $\lambda$, TIE and Blend share all seen-grade scores and differ only in the missing grades' displacement. Figure~\ref{fig:matched_strength} tests whether this transfer improves on the Blend family of Proposition~\ref{prop:family} (Sec.~\ref{sec:exp_matched}).
 
-How close is inherited displacement to what a grade would learn with direct supervision? A full-support model provides a diagnostic reference $D^{\mathrm{FS}}=S^{\mathrm{FS}}-T$. For a held-out interior grade $m$ whose immediate neighbors $m-1,m+1$ are seen, define $\bar D_m=\tfrac12(D^{\mathrm{FS}}_{m-1}+D^{\mathrm{FS}}_{m+1})$.
+How close is inherited displacement to what a grade would learn with direct supervision? A full-support model provides a diagnostic reference $D^{\mathrm{FS}}=S^{\mathrm{FS}}-T$. For an interior grade $m$ whose immediate neighbors $m-1$ and $m+1$ are seen, define $\bar D_m=\tfrac12(D_{m-1}^{\mathrm{FS}}+D_{m+1}^{\mathrm{FS}})$.
+
+We suppress the image argument $x$ in the following identity.
 
 \begin{proposition}[Transfer error is displacement curvature]
 \label{prop:tie_error}
 In this full-support diagnostic, the inheritance error $e_m(x)=D_m^{\mathrm{FS}}(x)-\bar D_m(x)$ is
 \begin{equation}
+e_m=-\tfrac12\bigl(
+D_{m-1}^{\mathrm{FS}}
+-2D_m^{\mathrm{FS}}
++D_{m+1}^{\mathrm{FS}}
+\bigr).
 \label{eq:tie_error}
-\begin{aligned}
-e_m(x)=-\tfrac12\bigl(&D_{m-1}^{\mathrm{FS}}(x)-2D_m^{\mathrm{FS}}(x)\\
-&+D_{m+1}^{\mathrm{FS}}(x)\bigr).
-\end{aligned}
 \end{equation}
 For any seen grade $n$, the full-support and inherited $m$--$n$ margins differ by $e_m(x)$. If $e_m$ is constant across images, the inherited margins reproduce the full-support pairwise ranking.
 \end{proposition}
@@ -52,14 +55,14 @@ For any seen grade $n$, the full-support and inherited $m$--$n$ margins differ b
 Expand $\bar D_m$ and subtract. The seen-grade displacement is unchanged, so the margin difference is $e_m$. A constant difference preserves ranking by Proposition~\ref{prop:cal}.
 \end{proof}
 
-In this diagnostic, inheritance error is exactly the local curvature of adaptation along the grade axis. It vanishes where the displacement is linear across the three adjacent grades; only the image-dependent part of curvature can change pairwise ranking. Section~\ref{sec:exp_structure} measures this distinction.
+In this diagnostic, inheritance error is exactly the local curvature of adaptation along the grade axis. It vanishes where the displacement is linear across the three adjacent grades; only the image-dependent part of curvature can change pairwise ranking. The decomposition isolates the part of inheritance error that can change pairwise ranking.
 
 \subsection{Calibration and Inference}
 
-Given a fitted CLIP adapter, TIE needs only aligned scores $S$ and $T$. After computing $S^{\mathrm{TIE}}$, we select $c^*$ as the largest feasible class-bias candidate on seen-only validation images. Feasibility requires the resulting seen-validation normalized MAE (nMAE) to be no more than the uncalibrated Adapted nMAE plus $\delta=0.005$. We then predict
+Given a fitted CLIP adapter, TIE needs only aligned scores $S$ and $T$. The adapted and zero-shot scores use the same grade order and a common pre-softmax score scale. After computing $S^{\mathrm{TIE}}$, we select $c^*$ as the largest feasible class-bias candidate on seen-only validation images. Feasibility requires the resulting seen-validation normalized MAE (nMAE) to be no more than the uncalibrated Adapted nMAE plus $\delta=0.005$. We then predict
 \begin{equation}
 \label{eq:tie_prediction}
 \hat y(x)=\arg\max_{k\in\mathcal Y}
 \bigl[S_k^{\mathrm{TIE}}(x)+c^*\mathbf1[k\in\mathcal U]\bigr].
 \end{equation}
-The grade mask fixes the anchor map, and TIE adds $O(K)$ score operations per image, with no further training. TIE fixes the order; calibration then fixes the score.
+The grade mask fixes the anchor map, and TIE adds $O(K)$ score operations per image, with no further training. TIE transfers task adaptation without retraining the underlying model; calibration then sets the decision operating point.

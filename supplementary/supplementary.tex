@@ -1,6 +1,34 @@
-% Input fragment, not a second main document.
-% Matches the title/page-reset mechanism in the official sec/X_suppl.tex.
+% Input fragment using the official supplementary-title mechanism.
 \clearpage
 \setcounter{page}{1}
 \maketitlesupplementary
-% TODO: Author-approved supplementary content.
+
+\section{Registered Calibration and Support Protocols}
+\label{sec:supp_protocols}
+
+\noindent\textbf{Grade display.}
+Display Grade $k$ corresponds to native label ID $k-1$; stored labels and score-column order are unchanged.
+
+\noindent\textbf{Calibration grids.}
+Tables~\ref{tab:supp_bias_adience}--\ref{tab:supp_bias_koniq} give the complete candidate grid for every primary configuration, mask, and seed.
+Each calibrated method uses its own largest feasible offset.
+The seen-validation nMAE budget is uncalibrated Adapted nMAE plus $\delta=0.005$.
+The negative-infinity boundary removes missing-grade predictions.
+An empty feasible set is recorded as blocked, rather than assigned a replacement offset.
+
+\noindent\textbf{Support denominator.}
+The 10\% and 20\% levels refer to each target grade's quota in a balanced, pre-mask pool of 256 images drawn from the same-seed training-only member union.
+Remainder quotas follow ascending native-grade order.
+For a positive fraction $r$ and target-grade quota $q_k$, the retained count is $\max(1,\lceil r q_k\rceil)$; 0\% retains no target-grade images.
+
+\noindent\textbf{Fixed-total protocol.}
+G2a covers Adience and HCI, and G2b covers FairFace and KonIQ.
+The total remains 256 images by removing seen-grade images in round-robin grade order as target-grade images are added.
+
+\noindent\textbf{Fixed-seen protocol.}
+G3 covers Adience and HCI.
+The pre-mask seen-grade images remain identical at all three support levels, while target-grade images are added.
+Its zero-support comparison uses its own matched zero-support run.
+
+Table~\ref{tab:supp_support} reports every method--task--protocol summary separately.
+\input{tables/supplement_protocols}

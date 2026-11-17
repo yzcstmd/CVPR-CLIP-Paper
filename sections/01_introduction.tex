@@ -34,24 +34,24 @@ This does change the order, but only along a single path through the zero-shot (
 Neither operation supplies the missing grade with the grade-specific adaptation it lacks.
 What matters is not merely how much adaptation is kept, but where the missing grade's displacement comes from.
 
-Ordinal label spaces offer a source that nominal ones do not.
-Nearby grades share task-relevant visual characteristics, and their displacements are adapted using labeled images from those seen grades.
-We propose \textbf{TIE}, which transfers this adaptation along the grade order: for every image, a missing grade inherits the displacement of its nearest seen grades while keeping its own zero-shot reference (Fig.~\ref{fig:teaser}b).
+Ordinal labels offer what nominal ones lack: an explicit neighborhood.
+We propose \textbf{TIE}, which ties each missing grade to its nearest seen grades: for every image, the missing grade inherits their displacement while keeping its own zero-shot reference (Fig.~\ref{fig:teaser}b).
 TIE needs no additional training and operates on the scores of different CLIP adapters.
 It leaves every seen-grade score untouched, and at an endpoint grade it provably recovers the zero-shot order with its nearest seen neighbor.
-Calibration then sets the operating point: TIE repairs the order, and calibration fixes the score.
+TIE changes the order, and calibration sets the decision operating point.
 
 We evaluate TIE on four ordinal benchmarks covering age, historical decade, and image quality, with nine adaptation configurations and six missing-grade patterns.
-With the same calibration protocol applied to both, TIE lowers the missing-grade and overall mean absolute error of the adapted model on all four benchmarks and improves missing--seen ranking (MS-AUC) for 34 of 36 adapter--dataset settings.
-Because TIE commutes with blending, we can also isolate its effect: at matched strength, the two paths share every seen-grade score and differ only in where the missing grade's displacement comes from (Fig.~\ref{fig:matched_strength}).
-Paired confidence intervals support a gain at 59 of 64 evaluated nonzero dataset--strength combinations.
-On three benchmarks, none of the 17 shared blending strengths---not even the best one, chosen on test performance---reaches TIE at the original strength in the adapter-averaged comparison.
+With the same calibration protocol applied to both, TIE lowers the missing-grade and overall mean absolute error of the adapted model on all four benchmarks and improves adjacent missing--seen pair AUROC (MS-AUC) for 34 of 36 adapter--dataset settings.
+Because the inheritance operator is linear, TIE commutes with blending, letting us isolate the effect of displacement transfer: at matched strength, the two methods share every seen-grade score and differ only in the missing grades' displacement (Fig.~\ref{fig:matched_strength}).
+TIE achieves ranking gains supported by paired intervals at 59 of 64 matched strengths.
+On three benchmarks, none of the 17 shared blending strengths---not even the best one, chosen on test data---reaches TIE at the original strength.
 There, TIE also surpasses the zero-shot model, so its gain is transfer, not a return to zero-shot.
 The gain is largest when a grade has no labeled training images.
 
 Our contributions are threefold:
 \begin{itemize}
-  \item \textbf{Finding.} For grades missing from adaptation, calibration and ranking separate: class-wise calibration cannot reorder missing-grade images against their neighbors, and blending toward zero-shot moves this order only along a single path.
+  \item \textbf{Finding.}
+For grades missing from adaptation, calibration and ranking separate: class-wise calibration provably cannot reorder images under a fixed missing--seen margin, while global blending changes ranking only along a single adaptation-strength path.
   \item \textbf{Method.} We decompose adapted scores into a zero-shot reference and an adaptation displacement, and propose TIE, a training-free ordinal displacement transfer that preserves seen-grade scores and exactly recovers the zero-shot order at endpoint grades.
   \item \textbf{Evidence.} Across four benchmarks, nine adaptation configurations, and six missing-grade patterns, TIE improves calibrated classification error and missing--seen ranking, outperforms blending in a controlled matched-strength comparison, and helps most when a grade has no supervision.
 \end{itemize}
