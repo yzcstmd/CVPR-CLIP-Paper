@@ -28,8 +28,9 @@ For any missing set $\mathcal U$ and image $x$:
 (ii) \emph{endpoint margin recovery}: if $m$ is a missing endpoint of the grade space and $n$ its nearest seen grade, $g_{mn}^{S^{\mathrm{TIE}}}(x)=g_{mn}^T(x)$;
 (iii) \emph{commutation with blending}: $T+\mathcal L_{\mathcal U}(\lambda D)=T+\lambda\mathcal L_{\mathcal U}(D)$ for all $\lambda\ge0$.
 \end{proposition}
-\noindent\emph{Proof.}
-The operator copies seen coordinates, giving (i). At a missing endpoint, the displacement $D_n$ is inherited and cancels in the margin, giving (ii). Each output is a fixed linear combination of input coordinates, giving (iii).\hfill$\square$
+\begin{proof}
+The operator copies seen coordinates, giving (i). At a missing endpoint, the displacement $D_n$ is inherited and cancels in the margin, giving (ii). Each output is a fixed linear combination of input coordinates, giving (iii).
+\end{proof}
 
 These properties have direct consequences. Seen--seen comparisons remain exactly as adapted. The specified endpoint--neighbor margin returns to its zero-shot value. At matched $\lambda$, TIE and Blend share all seen-grade scores and differ only in the missing grades' displacement. Figure~\ref{fig:matched_strength} tests whether this transfer improves on the Blend family of Proposition~\ref{prop:family} (Sec.~\ref{sec:exp_matched}).
 
@@ -47,8 +48,9 @@ e_m(x)=-\tfrac12\bigl(&D_{m-1}^{\mathrm{FS}}(x)-2D_m^{\mathrm{FS}}(x)\\
 \end{equation}
 For any seen grade $n$, the full-support and inherited $m$--$n$ margins differ by $e_m(x)$. If $e_m$ is constant across images, the inherited margins reproduce the full-support pairwise ranking.
 \end{proposition}
-\noindent\emph{Proof.}
-Expand $\bar D_m$ and subtract. The seen-grade displacement is unchanged, so the margin difference is $e_m$. A constant difference preserves ranking by Proposition~\ref{prop:cal}.\hfill$\square$
+\begin{proof}
+Expand $\bar D_m$ and subtract. The seen-grade displacement is unchanged, so the margin difference is $e_m$. A constant difference preserves ranking by Proposition~\ref{prop:cal}.
+\end{proof}
 
 In this diagnostic, inheritance error is exactly the local curvature of adaptation along the grade axis. It vanishes where the displacement is linear across the three adjacent grades; only the image-dependent part of curvature can change pairwise ranking. Section~\ref{sec:exp_structure} measures this distinction.
 

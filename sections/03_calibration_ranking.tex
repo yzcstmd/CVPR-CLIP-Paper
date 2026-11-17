@@ -15,7 +15,7 @@ ranks images drawn from the two grades.
 Pair AUROC is the probability that an image of grade $m$ receives a larger margin than an image of grade $n$ (ties count one half), and MS-AUC averages it over adjacent missing--seen pairs.
 Full-$K$ decisions and pairwise ranking are two properties of the same scores, and they can come apart.
 
-\subsection{What Class-Bias Calibration Can and Cannot Change}
+\subsection{Class-Bias Calibration and Ranking}
 
 Post-hoc calibration adds an offset to the missing grades, $\operatorname{Cal}_c(Z)_k=Z_k+c\,\mathbf 1[k\in\mathcal U]$, as in calibrated stacking~\cite{chao2016gzsl}.
 With a single missing grade $m$, the decision statistic is $Z_m(x)-\max_{k\neq m}Z_k(x)$, and varying $c$ moves its threshold without changing the ranking of images.
@@ -24,12 +24,13 @@ The pairwise ranking is equally immune to calibration, including temperature sca
 
 \begin{proposition}[Calibration preserves pairwise ranking]
 \label{prop:cal}
-Let $\widetilde Z(x)=aZ(x)+b$ with a shared scale $a>0$ and class biases $b\in\mathbb R^K$ independent of $x$.
-For every pair $(m,n)$, $g^{\widetilde Z}_{mn}$ and $g^{Z}_{mn}$ induce the same image ranking, the same ties, and the same pair AUROC.
+Let $Z'(x)=aZ(x)+b$, where $a>0$ is shared across grades and $b\in\mathbb R^K$ is independent of $x$.
+For every pair $(m,n)$, the margins $g_{mn}^{Z'}$ and $g_{mn}^{Z}$ induce the same image ranking, the same ties, and the same pair AUROC.
 \end{proposition}
 
-\noindent\emph{Proof.}
-$g^{\widetilde Z}_{mn}(x)=a\,g^{Z}_{mn}(x)+b_m-b_n$ is strictly increasing in $g^{Z}_{mn}(x)$.\hfill$\square$
+\begin{proof}
+$g_{mn}^{Z'}(x)=a\,g_{mn}^{Z}(x)+b_m-b_n$ is a strictly increasing function of $g_{mn}^{Z}(x)$.
+\end{proof}
 
 Fig.~\ref{fig:teaser}c shows the consequence on real data: recall rises, while the pair AUROC does not move.
 To improve the order, the scores must change in an image-dependent way.
@@ -52,12 +53,17 @@ Blending rescales the displacement of every grade; with calibration on top, it s
 
 \begin{proposition}[Calibrated blending spans a one-parameter ranking family]
 \label{prop:family}
-Let $\widetilde B_\lambda=a(T+\lambda D)+b$ with $\lambda\ge0$, a shared scale $a>0$, and class biases $b\in\mathbb R^K$ independent of $x$.
-For every pair $(m,n)$, $\widetilde B_\lambda$ ranks images exactly as $\Delta T_{mn}+\lambda\,\Delta D_{mn}$ does, so the ranking depends on $\lambda$ alone.
+Let $C_\lambda(x)=a[T(x)+\lambda D(x)]+b$, with $\lambda\ge0$, a shared scale $a>0$, and class biases $b\in\mathbb R^K$ independent of $x$.
+For every pair $(m,n)$, $C_\lambda$ ranks images exactly as $\Delta T_{mn}+\lambda\Delta D_{mn}$ does, so the ranking depends on $\lambda$ alone.
 \end{proposition}
 
-\noindent\emph{Proof.}
-By \eqref{eq:margin_decomposition}, $g^{\widetilde B_\lambda}_{mn}=a(\Delta T_{mn}+\lambda\,\Delta D_{mn})+b_m-b_n$; apply Proposition~\ref{prop:cal}.\hfill$\square$
+\begin{proof}
+The pair margin is
+$g_{mn}^{C_\lambda}(x)
+=a[\Delta T_{mn}(x)+\lambda\Delta D_{mn}(x)]
++b_m-b_n$.
+This is a positive affine transformation of the uncalibrated margin, so Proposition~\ref{prop:cal} applies.
+\end{proof}
 
 Blending thus traces a single ranking path through the zero-shot ($\lambda=0$) and adapted ($\lambda=1$) models, with $\lambda>1$ extrapolating.
 Calibration leaves the ranking at each point of this path unchanged.
