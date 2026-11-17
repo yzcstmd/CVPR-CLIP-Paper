@@ -2,13 +2,62 @@
 \label{sec:tie}
 
 \subsection{Neighbor Displacement Inheritance}
-\label{sec:inheritance}
-% TODO: Author-approved definition; TIE is a method name, not an expansion.
+
+Section~\ref{sec:calibration_ranking} shows that shifting or globally scaling adapted scores cannot supply a missing grade with adaptation learned from its own images. TIE instead transfers displacement along the grade order. Adjacent grades often share visual cues, making their learned displacements a natural proxy for the adaptation the missing grade could not learn directly.
+
+For each image $x$, let $T,S\in\mathbb R^K$ be the zero-shot and adapted scores, and let $D=S-T$. For a missing grade $k\in\mathcal U$, let $\ell(k)$ and $r(k)$ denote its nearest seen grades below and above it, when available. Writing $\ell=\ell(k)$ and $r=r(k)$, define
+\begin{equation}
+\label{eq:tie_operator}
+[\mathcal L_{\mathcal U}(D)]_k=\begin{cases}
+D_k, & k\in\mathcal O,\\
+\tfrac12(D_{\ell}+D_r), & \ell,r\text{ exist},\\
+D_{\ell}, & \ell\text{ only},\\
+D_r, & r\text{ only}.
+\end{cases}
+\end{equation}
+The final scores are $S^{\mathrm{TIE}}=T+\mathcal L_{\mathcal U}(D)$. The rule handles individual missing grades and consecutive missing blocks. Its anchors follow the grade mask, and its weights are fixed.
+
+TIE transfers the displacement, not the entire adapted score. Averaging neighboring scores would also replace $T_m$, the missing grade's own vision--language reference. TIE preserves that reference while borrowing the adaptation learned at neighboring grades.
 
 \subsection{Structural Properties and Inheritance Error}
-\label{sec:structural_properties}
-% TODO: Author-approved properties with their precise scope.
+
+\begin{proposition}[Structure of TIE]
+\label{prop:tie_structure}
+For any missing set $\mathcal U$ and image $x$:
+(i) \emph{seen scores are preserved}: $S_k^{\mathrm{TIE}}(x)=S_k(x)$ for all $k\in\mathcal O$;
+(ii) \emph{endpoint margin recovery}: if $m$ is a missing endpoint of the grade space and $n$ its nearest seen grade, $g_{mn}^{S^{\mathrm{TIE}}}(x)=g_{mn}^T(x)$;
+(iii) \emph{commutation with blending}: $T+\mathcal L_{\mathcal U}(\lambda D)=T+\lambda\mathcal L_{\mathcal U}(D)$ for all $\lambda\ge0$.
+\end{proposition}
+\noindent\emph{Proof.}
+The operator copies seen coordinates, giving (i). At a missing endpoint, the displacement $D_n$ is inherited and cancels in the margin, giving (ii). Each output is a fixed linear combination of input coordinates, giving (iii).\hfill$\square$
+
+These properties have direct consequences. Seen--seen comparisons remain exactly as adapted. The specified endpoint--neighbor margin returns to its zero-shot value. At matched $\lambda$, TIE and Blend share all seen-grade scores and differ only in the missing grades' displacement. Figure~\ref{fig:matched_strength} tests whether this transfer improves on the Blend family of Proposition~\ref{prop:family} (Sec.~\ref{sec:exp_matched}).
+
+How close is inherited displacement to what a grade would learn with direct supervision? A full-support model provides a diagnostic reference $D^{\mathrm{FS}}=S^{\mathrm{FS}}-T$. For a held-out interior grade $m$ whose immediate neighbors $m-1,m+1$ are seen, define $\bar D_m=\tfrac12(D^{\mathrm{FS}}_{m-1}+D^{\mathrm{FS}}_{m+1})$.
+
+\begin{proposition}[Transfer error is displacement curvature]
+\label{prop:tie_error}
+In this full-support diagnostic, the inheritance error $e_m(x)=D_m^{\mathrm{FS}}(x)-\bar D_m(x)$ is
+\begin{equation}
+\label{eq:tie_error}
+\begin{aligned}
+e_m(x)=-\tfrac12\bigl(&D_{m-1}^{\mathrm{FS}}(x)-2D_m^{\mathrm{FS}}(x)\\
+&+D_{m+1}^{\mathrm{FS}}(x)\bigr).
+\end{aligned}
+\end{equation}
+For any seen grade $n$, the full-support and inherited $m$--$n$ margins differ by $e_m(x)$. If $e_m$ is constant across images, the inherited margins reproduce the full-support pairwise ranking.
+\end{proposition}
+\noindent\emph{Proof.}
+Expand $\bar D_m$ and subtract. The seen-grade displacement is unchanged, so the margin difference is $e_m$. A constant difference preserves ranking by Proposition~\ref{prop:cal}.\hfill$\square$
+
+In this diagnostic, inheritance error is exactly the local curvature of adaptation along the grade axis. It vanishes where the displacement is linear across the three adjacent grades; only the image-dependent part of curvature can change pairwise ranking. Section~\ref{sec:exp_structure} measures this distinction.
 
 \subsection{Calibration and Inference}
-\label{sec:calibration_inference}
-% TODO: Author-approved calibration and inference protocol.
+
+Given a fitted CLIP adapter, TIE needs only aligned scores $S$ and $T$. After computing $S^{\mathrm{TIE}}$, we select $c^*$ as the largest feasible class-bias candidate on seen-only validation images. Feasibility requires the resulting seen-validation normalized MAE (nMAE) to be no more than the uncalibrated Adapted nMAE plus $\delta=0.005$. We then predict
+\begin{equation}
+\label{eq:tie_prediction}
+\hat y(x)=\arg\max_{k\in\mathcal Y}
+\bigl[S_k^{\mathrm{TIE}}(x)+c^*\mathbf1[k\in\mathcal U]\bigr].
+\end{equation}
+The grade mask fixes the anchor map, and TIE adds $O(K)$ score operations per image, with no further training. TIE fixes the order; calibration then fixes the score.
