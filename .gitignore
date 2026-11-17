@@ -26,6 +26,8 @@
 # Local receipts include server paths and are deliberately not published.
 /.local/
 /docs/P0_INITIALIZATION_REPORT.md
+# Author-provided internal writing blueprint: local read-only reference.
+/docs/CLIP_PAPER_STRONGEST_NARRATIVE_FINAL_LOCKED.md
 
 # Research assets and secrets are outside this paper-source repository.
 /data/

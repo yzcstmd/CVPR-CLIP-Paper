@@ -1,0 +1,102 @@
+{
+  "received_and_checked_at_UTC": "2026-11-17T05:56:53.953645+00:00",
+  "assets": [
+    {
+      "source_filename": "clip_fig1.pdf",
+      "destination": "figures/fig1.pdf",
+      "SHA256": "73662d384bba2851e9a6cef37bed4c359e52319cc4c6e4db99ec84aa31a63429",
+      "bytes": 400348,
+      "pages": 1,
+      "MediaBox_PDF_points": [
+        0.0,
+        0.0,
+        504.0,
+        198.0
+      ],
+      "height_at_official_6_875_inch_textwidth_inches": 2.700892857142857,
+      "Author_metadata_empty": true,
+      "Title_metadata_empty": true,
+      "font_descriptors": [
+        {
+          "font": "ARUOJW+Arial-ItalicMT",
+          "embedded_font_program": true,
+          "font_program_object": 28
+        },
+        {
+          "font": "DIXAAP+Arial-BoldMT",
+          "embedded_font_program": true,
+          "font_program_object": 13
+        },
+        {
+          "font": "FVZGZT+ArialMT",
+          "embedded_font_program": true,
+          "font_program_object": 34
+        },
+        {
+          "font": "DCUOFF+STSongti-SC-Regular",
+          "embedded_font_program": true,
+          "font_program_object": 23
+        },
+        {
+          "font": "REBVGY+Arial-BoldItalicMT",
+          "embedded_font_program": true,
+          "font_program_object": 18
+        }
+      ],
+      "source": "author-supplied final PDF in this continuation",
+      "permission_scope": "user-directed paper integration; no independent per-image license certification",
+      "scientific_content_or_appearance_changed": false,
+      "rendering_verified": false
+    },
+    {
+      "source_filename": "clip_fig2.pdf",
+      "destination": "figures/fig2.pdf",
+      "SHA256": "43898365c3584fcfa231c03cb6f4678011ac21db03541a728c723cdde38daa1f",
+      "bytes": 235059,
+      "pages": 1,
+      "MediaBox_PDF_points": [
+        0.0,
+        0.0,
+        504.0,
+        162.0
+      ],
+      "height_at_official_6_875_inch_textwidth_inches": 2.2098214285714284,
+      "Author_metadata_empty": true,
+      "Title_metadata_empty": true,
+      "font_descriptors": [
+        {
+          "font": "FVZGZT+ArialMT",
+          "embedded_font_program": true,
+          "font_program_object": 18
+        },
+        {
+          "font": "ARUOJW+Arial-ItalicMT",
+          "embedded_font_program": true,
+          "font_program_object": 23
+        },
+        {
+          "font": "DIXAAP+Arial-BoldMT",
+          "embedded_font_program": true,
+          "font_program_object": 13
+        }
+      ],
+      "source": "author-supplied final PDF in this continuation",
+      "permission_scope": "user-directed paper integration; no independent per-image license certification",
+      "scientific_content_or_appearance_changed": false,
+      "rendering_verified": false
+    }
+  ],
+  "writing_framework": {
+    "filename": "CLIP_PAPER_STRONGEST_NARRATIVE_FINAL_LOCKED.md",
+    "SHA256": "d5a43a8b889b292efb665bd222d3d01251c51093b3e707c8a5885302485c6c21",
+    "bytes": 21768,
+    "handling": "local read-only reference; whole blueprint excluded from public Git and Overleaf archive"
+  },
+  "separate_terminology_FINAL_v2_file": "NOT_PROVIDED; blueprint references it but is not that file",
+  "validation_limitations": [
+    "No PDF renderer or TeX compiler available",
+    "No visual rendering or compiled-page verification",
+    "No recomputation of scientific numbers",
+    "Final identity follows the author-provided files, not historical export matching"
+  ]
+}

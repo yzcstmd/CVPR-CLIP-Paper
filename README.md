@@ -1,12 +1,14 @@
 # CVPR 2027 paper source
 
 **Fixing the Score Is Not Fixing the Order:
-Ordinal Transfer for Unseen Grades in CLIP**
+Ordinal Transfer to Unseen Grades in Adapted CLIP**
 
 This repository contains the P0 LaTeX initialization only: the frozen title,
 six main sections, subsection skeletons, and a provisional administrative LLM
-disclosure. It contains no scientific manuscript prose, experiment results,
-unverified citations, or final figures.
+disclosure. The title/outline follow the author's subsequently supplied locked
+writing blueprint. Scientific body text and captions remain unwritten.
+The two author-supplied final PDFs are included unchanged; no results table or
+unverified citation is initialized.
 
 The official template is pinned to **CVPR2027-v1**, commit
 `a2369342011145be8c85e5ad21a9b61f9fa53473`. The style, preamble, and bibliography
@@ -33,12 +35,15 @@ sections/
   06_conclusion.tex
   90_llm_usage_statement.tex
 figures/README.md
+figures/fig1.pdf
+figures/fig2.pdf
 tables/README.md
 supplementary/supplementary.tex
 docs/
   CVPR2027_FORMAT_CHECKLIST.md
   PAPER_STRUCTURE.md
   FIGURE_ASSET_STATUS.md
+  FIGURE_ASSET_PROVENANCE.json
   OVERLEAF_SYNC.md
   TEMPLATE_PROVENANCE.json
   TEMPLATE_SHA256SUMS.txt
@@ -52,9 +57,11 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
 For Overleaf, import tracked sources and select root `main.tex` with pdfLaTeX;
-see `docs/OVERLEAF_SYNC.md`. Figure 1, Figure 2, and the separate frozen
-terminology file await author delivery. Safe commented figure slots do not
-introduce missing-file dependencies.
+see `docs/OVERLEAF_SYNC.md`. Figure 1 and Figure 2 are enabled at full text
+width, with empty captions pending author text. Their original hashes,
+source-level PDF checks, and rendering limitations are recorded in
+`docs/FIGURE_ASSET_PROVENANCE.json`. The separate frozen terminology file
+remains unavailable; the received narrative blueprint does not replace it.
 
 Bibliography is disabled until actual verified citations exist. Supplementary
 material is disabled by default. Neither switch changes the six-section outline.

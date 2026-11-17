@@ -12,8 +12,10 @@ server path is needed by an active LaTeX input.
 4. Add only verified bibliography entries and real citations, then change
    `\paperhasreferencesfalse` to `\paperhasreferencestrue`. Recompile through
    the normal BibTeX cycle; retain `ieeenat_fullname`.
-5. When author-final figures arrive, follow `FIGURE_ASSET_STATUS.md`. Do not
-   replace them with historical plots or enable nonexistent image paths.
+5. The two author-final PDFs are included as `figures/fig1.pdf` and
+   `figures/fig2.pdf`. Their full-width figure slots are enabled with empty
+   captions awaiting author text. Inspect their rendering and float placement;
+   preserve the PDFs and follow `FIGURE_ASSET_STATUS.md`.
 6. Complete and author-review the LLM Usage Statement. Keep review mode and
    exclude supplement pages from the main review submission.
 

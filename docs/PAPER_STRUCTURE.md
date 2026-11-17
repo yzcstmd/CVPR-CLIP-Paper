@@ -4,10 +4,13 @@ This is an engineering skeleton. Scientific prose, results, citations, and final
 captions remain author work.
 
 Title: **Fixing the Score Is Not Fixing the Order:
-Ordinal Transfer for Unseen Grades in CLIP**
+Ordinal Transfer to Unseen Grades in Adapted CLIP**
 
-The P0 instruction freezes this title; do not restore a historical title
-automatically.
+This title and the headings below follow the subsequently supplied
+`CLIP_PAPER_STRONGEST_NARRATIVE_FINAL_LOCKED.md`. They supersede the earlier
+P0 title/outline; this is alignment to the author's locked blueprint, not an
+agent-proposed title change. The original blueprint remains a local read-only
+reference and is excluded from public Git and the Overleaf archive.
 
 | Number | Heading | Source |
 |---|---|---|
@@ -25,10 +28,10 @@ automatically.
 | 5 | Experiments | `sections/05_experiments.tex` |
 | 5.1 | Experimental Setup | same file |
 | 5.2 | Main Results under Matched Calibration | same file |
-| 5.3 | Matched-Strength Ranking Analysis | same file |
-| 5.4 | Structural and Supervision Analyses | same file |
-| 5.5 | Extensions and Scope | same file |
-| 6 | Conclusion | `sections/06_conclusion.tex` |
+| 5.3 | Ordinal Transfer Beyond Global Blending | same file |
+| 5.4 | When and Why Transfer Helps | same file |
+| 5.5 | Generality Across Adapters and Domains | same file |
+| 6 | Conclusion and Limitations | `sections/06_conclusion.tex` |
 | unnumbered | LLM Usage Statement | `sections/90_llm_usage_statement.tex` |
 | — | References, when populated | `main.bib` |
 
@@ -40,13 +43,19 @@ initialization only and explicitly requires author completion.
 There is one root `main.tex`. Supplementary material is an input fragment,
 disabled by default, using the official `\maketitlesupplementary` mechanism.
 
+The writing rationale is shift–scale–transfer. The blueprint is used here only
+to align the skeleton: its abstract draft, claims, results, and suggested prose
+have not been inserted. Final figure PDFs are included byte for byte, with
+empty captions reserved for author-approved text.
+
 ## Terminology
 
-`CLIP_PAPER_TERMINOLOGY_FINAL_FROZEN_20261117.md` was not found in the
-accessible project/attachment search. The author deferred providing its path.
-Do not claim this file has been reviewed.
+The supplied strongest-narrative blueprint references a separate FINAL v2
+terminology document. That separate
+`CLIP_PAPER_TERMINOLOGY_FINAL_FROZEN_20261117.md` has not been supplied or
+reviewed; the narrative blueprint is not silently treated as that document.
 
-Until it arrives, retain only the explicitly supplied terms:
+Retain the explicitly supplied terms:
 CLIP-based ordinal classification; missing grades / seen grades;
 Reference–Displacement Analysis; TIE; ordinal displacement transfer;
 post-hoc class-bias calibration; global score blending; MS-AUC;

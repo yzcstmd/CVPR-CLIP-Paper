@@ -18,9 +18,9 @@ Sources checked:
 | 3. Main length | At most eight pages including figures/tables | Rule recorded; page count unknown |
 | 4. Reference pages | Cited references excluded from the main-page limit | Conditional bibliography prepared; no entries fabricated |
 | 5. LLM statement | Required after main text and before references; excluded from limit | Section present; truthful P0 disclosure, author completion required |
-| 6. Captions | 9pt Roman; figures below, tables above; native caption setup | No overrides; assets pending |
+| 6. Captions | 9pt Roman; figures below, tables above; native caption setup | Native setup; figure captions empty pending author text |
 | 7. Headings | Native numbered section/subsection commands and template fonts | Six sections and frozen subsections present |
-| 8. Images | PDF/PNG/JPEG supported by the recommended pdfLaTeX route; vector PDF preferred for final plots | No active missing image inputs; final PDFs deferred |
+| 8. Images | PDF/PNG/JPEG supported by the recommended pdfLaTeX route; vector PDF preferred for final plots | Two author-final PDFs included; no missing image input; rendering unverified |
 | 9. Anonymity | No identifying authors, affiliations, acknowledgments, or identifying material in review PDF | Anonymous source; blank PDF author metadata |
 | 10. Supplement | Official page break, page reset and `\maketitlesupplementary` | Optional input fragment disabled in the main review build |
 | 11. Compiler/packages | pdfLaTeX through `latexmk -pdf`; BibTeX when real citations exist | Tools absent locally; no system installation performed |
@@ -52,10 +52,11 @@ pages before submission as directed by the official kit.
 copies. No margin, spacing, font-size, caption-size, or page-limit workaround is
 enabled. The pinned preamble's optional layout tweaks remain commented.
 
-The full staged `git diff --check` reports two upstream trailing-space lines:
+The initial P0 full staged `git diff --check` reported two upstream trailing-space lines:
 `preamble.tex:11` and `ieeenat_fullname.bst:2`. They are preserved to keep the
-official files byte-identical. A separate check excluding only the three
-hash-verified upstream files passes for the authored project files.
+official files byte-identical. The initial separately scoped authored-file check
+passed. The current asset-integration diff also passes the full check; none of
+these three upstream files is modified.
 
 ## Dependencies inspected in the source
 
@@ -71,7 +72,13 @@ installer is executed in P0. Use a normal complete Overleaf TeX environment.
 **READY_FOR_OVERLEAF_COMPILE_NOT_LOCALLY_VERIFIED**
 
 `latexmk`, `pdflatex`, `bibtex`, `tectonic`, `xelatex`, `lualatex`, and
-`kpsewhich` were not found. PDF page count, runtime references, font embedding,
-missing-package errors, and overfull boxes cannot be assessed. There is no claim
+`kpsewhich` were not found. Main-document PDF page count, runtime references,
+main-document font embedding, missing-package errors, and overfull boxes cannot be assessed. There is no claim
 of successful compilation, a valid eight-page manuscript, or completed Overleaf
 testing.
+
+The received figure PDFs were separately inspected at the source-object level:
+each has one page and empty Author metadata, and all located font descriptors
+reference embedded font programs. Figure boxes are 504 by 198 and 504 by 162
+PDF points. This structural inspection is not a rendered manuscript check.
+Original PDF hashes and source limitations are in `FIGURE_ASSET_PROVENANCE.json`.

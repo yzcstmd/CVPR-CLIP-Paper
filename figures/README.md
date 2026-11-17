@@ -1,14 +1,14 @@
 # Final figure assets
 
-Figure 1 and Figure 2 are pending author delivery. No historical figure or
-photograph is included in this initialization.
+The author supplied final `clip_fig1.pdf` and `clip_fig2.pdf`. Their unchanged
+publication copies are `fig1.pdf` and `fig2.pdf`; the original uploaded files
+remain local and ignored. No historical export was substituted.
 
-Reserved filenames: `fig1.pdf` and `fig2.pdf`. After the author supplies the
-confirmed final PDFs, record each source and SHA256, inspect PDF metadata and
-fonts, and verify its full-width rendering. Do not redraw, recolor, relabel,
-crop, or change scientific values during initialization.
+Source SHA256, page boxes, and structural font/metadata checks are in
+`../docs/FIGURE_ASSET_PROVENANCE.json`. No PDF content, color, text, crop,
+or scientific value was changed. Local rendering remains unverified.
 
-The disabled slots use `figure*` and
+The enabled slots use `figure*` and
 `\includegraphics[width=\textwidth]{figures/fig1.pdf}` or `fig2.pdf`.
-Add an author-approved caption below each figure before enabling its slot.
+Captions below the figures are intentionally empty pending author-approved text.
 Do not insert PPTX files directly into LaTeX.
