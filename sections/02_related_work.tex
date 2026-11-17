@@ -1,3 +1,27 @@
 \section{Related Work}
+\label{sec:related}
 \label{sec:related_work}
-% TODO: Author-approved related work and verified citations.
+
+\noindent\textbf{Visual ordinal classification.}
+Ordinal methods exploit label order through soft or distributional targets~\cite{diaz2019sord,gao2017dldl}, rank-consistent outputs~\cite{cao2020coral}, probabilistic embeddings~\cite{li2021poe}, or contrastive objectives~\cite{pitawela2025cloc,lee2026conord}.
+Vision--language models add a language prior over grades.
+OrdinalCLIP~\cite{li2022ordinalclip} interpolates learnable rank embeddings, L2RCLIP~\cite{wang2023l2rclip} refines rank prompts and cross-modal ordering, and NumCLIP~\cite{du2024numclip} grounds numerical bins in language with ranking regularization.
+These methods shape how grades are represented while training on the grades that are available.
+We ask a complementary question: how to give grades absent from adaptation the adaptation they missed, after training and across different CLIP adapters.
+TIE does not interpolate rank embeddings; it transfers image-dependent score displacements from seen neighbors while keeping each missing grade's zero-shot reference.
+
+\noindent\textbf{CLIP adaptation and generalization.}
+CLIP is commonly adapted with learned prompts~\cite{zhou2022coop,zhou2022cocoop,khattak2023maple} or with feature, cache, and residual adapters~\cite{gao2024clipadapter,zhang2022tipadapter,yu2023taskres}.
+To generalize from base to novel classes, KgCoOp~\cite{yao2023kgcoop} and ProGrad~\cite{zhu2023prograd} keep the learned prompts close to zero-shot knowledge.
+Base-to-novel benchmarks, however, treat novel classes as nominal and usually evaluate them apart from the base classes.
+Missing grades differ on both counts: they are predicted jointly with the seen grades, and they have adapted neighbors whose displacements can be inherited.
+Robust fine-tuning likewise protects pretrained knowledge, by preserving features during adaptation~\cite{kumar2022lpft} or by interpolating zero-shot and fine-tuned weights~\cite{wortsman2022robust}.
+Its output-space counterpart, blending zero-shot and adapted scores, serves as our structure-agnostic control.
+Blending rescales the adaptation of every grade; TIE changes where the missing grades' adaptation comes from.
+
+\noindent\textbf{Calibration for unseen classes.}
+Post-hoc calibration rescales logits with a shared temperature~\cite{guo2017calibration} or shifts them with class-wise offsets, as in calibrated stacking for generalized zero-shot learning~\cite{chao2016gzsl} and logit adjustment for long-tailed recognition~\cite{menon2021logit}.
+For classes absent during fine-tuning, Mai et al.~\cite{mai2024fine} trace the accuracy drop to a logit-scale discrepancy rather than forgotten features, and show that calibration restores the predictions.
+We study a property that these corrections cannot reach: how images are ranked by the margin between a missing grade and its seen neighbor.
+A shared temperature and class-wise offsets leave this ranking unchanged (Sec.~\ref{sec:calibration_ranking}); they move the decision threshold, not the order.
+TIE acts on the displacement before calibration, making ordinal transfer and operating-point selection two separate steps.
