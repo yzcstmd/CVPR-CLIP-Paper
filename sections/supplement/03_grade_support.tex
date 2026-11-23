@@ -22,7 +22,7 @@ Change in MS-AUC from Adapted to TIE at 0\%, 10\%, and 20\% target-grade support
 
 All 18 adapter--dataset--protocol trajectories show decreasing average ranking gains from 0\% to 10\% to 20\% support. The largest gains occur when target grades have no images of their own. Once direct supervision is introduced, inheritance contributes less additional information.
 
-The transition is especially clear on HCI. Under both protocols, all three configurations show negative incremental ranking gains at 10\% and 20\% support. Other tasks retain positive gains for several partially observed settings. The value of inherited displacement therefore changes with the amount of adaptation learned directly for a target grade.
+On HCI, TIE lowers MS-AUC for all three configurations at 10\% and 20\% target-grade support. Direct supervision reduces the need for inherited displacement, and the benefit of transfer depends on how much a grade has learned from its own images.
 
 \subsection{Endpoints, Interior Grades, and Missing Blocks}
 \label{sec:supp_missing_structure}
@@ -61,31 +61,10 @@ For consecutive missing grades, equal-weight inheritance gives every grade in th
 \subsection{Full-Support Reference}
 \label{sec:supp_fullsupport}
 
-We compare the masked models with FullSup, a budget-matched reference adapted using labeled images from every grade. FullSup uses 256 training images and 64 validation images in total, now distributed across the complete label space. The masked models use the same total budgets with no images from the missing grades.
+We compare masked adaptation with FullSup, a budget-matched reference trained with labeled images from every grade. FullSup uses 256 training images and 64 validation images in total, distributed across the complete grade space. The masked models use the same budgets, with training and validation images drawn from seen grades.
 
-Table~\ref{tab:supp_fullsupport} reports uncalibrated missing-grade MAE. TIE closes 44--58\% of the Adapted--FullSup gap on Adience, HCI, and FairFace. On KonIQ, TIE exceeds the full-support reference in gap closure, with lower missing-grade MAE for eight of nine adapter configurations.
+FullSup provides a direct-supervision reference for missing-grade performance (Table~2(a) of the main paper). TIE closes 44--58\% of the Missing MAE gap on Adience, HCI, and FairFace. On KonIQ, TIE closes more than the full gap (111\%): its Missing MAE is below FullSup's for eight of nine configurations.
 
-\begin{table}[t]
-\centering
-\caption{\textbf{Missing-grade error relative to full support.}
-Uncalibrated Missing MAE ($\downarrow$), averaged over nine configurations and six masks with three seeds. Gap closed is first computed within each adapter and then averaged; it is not the ratio of the displayed means.}
-\label{tab:supp_fullsupport}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrrr@{}}
-\toprule
-Dataset & Adapted & TIE & FullSup & Closed \\
-\midrule
-Adience & 1.089 & 0.685 & 0.418 & 58\% \\
-HCI & 1.377 & 1.052 & 0.642 & 44\% \\
-FairFace & 1.071 & 0.696 & 0.417 & 56\% \\
-KonIQ & 1.446 & 0.883 & 0.938 & 111\% \\
-\bottomrule
-\end{tabular*}
-\end{table}
+Gap closure is computed within each adapter before averaging, so it can differ slightly from the ratio of the mean errors in main-paper Table~2(a).
 
-For each adapter--dataset setting, gap closure divides the improvement from Adapted to TIE by the improvement from Adapted to FullSup.
-All 36 Missing MAE ratios and 35 MS-AUC ratios satisfy the reporting rule in Sec.~\ref{sec:supp_f_metrics}; the latter have a median of 63\%.
-
-FullSup uses one model per configuration and seed, evaluated on each mask's target grades.
-It provides a reference for direct supervision at the same total label budget, with training and validation images covering all grades.
+Across adapters, the MS-AUC gap-closure ratio has a median of 63\%. One setting is excluded because its FullSup improvement does not meet the reporting criterion in Sec.~\ref{sec:supp_f_metrics}.

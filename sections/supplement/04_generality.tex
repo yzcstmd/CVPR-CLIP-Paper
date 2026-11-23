@@ -133,7 +133,7 @@ The classification results reveal a second distinction. Before calibration, TIE 
 
 
 
-A separate NumCLIP~\cite{du2024numclip} HCI experiment provides an interface-level comparison. Its adapted model predicts no missing-grade images in all 18 evaluated conditions. The ported implementation does not provide an aligned zero-shot score reference for the required $S=T+D$ construction, so it is not used as a TIE comparison.
+Missing-grade prediction collapse also appears beyond prompt adapters: the evaluated NumCLIP~\cite{du2024numclip} implementation predicts no missing-grade HCI image in 18 conditions.
 
 
 
@@ -153,7 +153,6 @@ Pairwise order and the resulting full-$K$ decisions therefore remain distinct.
 
 Table~\ref{tab:supp_extension_results}a extends the comparison to LAION-pretrained CLIP~\cite{cherti2023reproducible} and a ResNet-50 backbone. With LAION weights, TIE improves MS-AUC in all four adapter--dataset settings and reduces Missing MAE in all four. On HCI with RN50, the three tested adapters also gain MS-AUC and lower Missing MAE.
 
-The larger ViT-L/14 experiments provide a complementary adaptation diagnostic. Their adapted MS-AUC reaches 0.944, 0.815, 0.808, and 0.596 on Adience, HCI, FairFace, and KonIQ, respectively. Missing-grade recall nevertheless remains zero on HCI and KonIQ. Stronger adapted ranking alone does not guarantee that missing grades are selected by the full classifier.
 
 \subsection{Additional Domains}
 \label{sec:supp_additional_domains}
@@ -161,5 +160,3 @@ The larger ViT-L/14 experiments provide a complementary adaptation diagnostic. T
 We evaluate facial-beauty prediction on SCUT-FBP5500~\cite{liang2018scut} using its five official folds. TIE improves MS-AUC by 0.120 with CoOp-style adaptation and 0.188 with OrdinalCLIP-style adaptation. Missing MAE also decreases for both, by 0.059 and 0.083.
 
 We further evaluate five-grade diabetic-retinopathy severity on DDR~\cite{li2019ddr}. Table~\ref{tab:supp_extension_results}b reports all nine combinations of three CLIP backbones and three adapters. TIE reduces Missing MAE in every combination, while Seen MAE increases in every combination. MS-AUC improves in two of nine settings, and Overall MAE decreases in six. The medical extension thus shows a different balance between missing-grade recovery and ranking.
-
-DDR uses content-proxy groups; patient identifiers are unavailable.

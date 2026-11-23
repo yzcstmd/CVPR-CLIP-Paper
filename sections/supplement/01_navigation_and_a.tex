@@ -9,10 +9,11 @@ The remaining sections establish how transfer depends on supervision, extend the
 \textbf{C} & Grade support, missing patterns, and full support.\\
 \textbf{D} & Adaptation regimes, backbones, and domains.\\
 \textbf{E} & Derivations and the inference algorithm.\\
-\textbf{F} & Configurations, prompts, and evaluation protocols.
+\textbf{F} & Experimental Protocols and Reproducibility.
 \end{tabularx}
 
 \noindent The central comparisons are in Secs.~\ref{sec:supp_best_blend}--\ref{sec:supp_error_tradeoffs} and \ref{sec:supp_keep_inherit}; Sec.~\ref{sec:supp_inheritance_error} explains the remaining inheritance error.
+The adapter details, task templates, operator comparisons, and error decomposition referenced in the main paper are in Secs.~\ref{sec:supp_adapters}, \ref{sec:supp_data_prompts}, \ref{sec:supp_keep_inherit}--\ref{sec:supp_inheritance_rules}, and \ref{sec:supp_inheritance_error}.
 
 \section{Beyond Global Blending}
 \label{sec:supp_blending}
@@ -53,7 +54,7 @@ The improvement spans the adaptation configurations, while the curves expose dif
 \includegraphics[width=\textwidth]{figures/supp/supp_a_configuration_curves.pdf}
 \caption{\textbf{Ranking gains across configurations and strengths.}
 Each panel shows $\Delta=\text{MS-AUC}(\text{TIE})-\text{MS-AUC}(\text{Blend})$ for one configuration and dataset, averaged over three interior masks and three seeds.
-Points mark all 17 evaluated strengths; available paired pointwise 95\% bootstrap intervals are shaded.
+Points mark all 17 evaluated strengths; paired pointwise 95\% bootstrap intervals are shaded.
 Horizontal lines mark zero gain and vertical dashed lines mark $\lambda=1$.
 All panels in a column share their vertical scale.
 Configuration definitions are given in Sec.~F.2.}

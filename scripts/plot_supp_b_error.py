@@ -101,7 +101,7 @@ for values, offset, color, marker, label in [
         )
         text = text.replace("-", "−")
         ax.annotate(
-            text, (value, row), xytext=(4, 0),
+            text, (value, row), xytext=(8 if offset < 0 else 4, 6 if offset < 0 else -6),
             textcoords="offset points", va="center",
             ha="left", fontsize=7.5, color=color
         )

@@ -55,16 +55,9 @@ Configuration & Components, scores, and objective & Optimization and selection\\
 
 \medskip
 \begin{minipage}{\textwidth}
-\textit{Prompt initialization.}
-CoOp-style and KgCoOp-style use the suffixes
-\texttt{person aged \{grade\} years} for age,
-\texttt{\{grade\}} for HCI, and
-\texttt{\{grade\} image quality} for KonIQ.
-OrdinalCLIP-style tokenizes
-\texttt{age estimation: the age of the person is},
-\texttt{historical dating: a photo taken in the}, and
-\texttt{aesthetics assessment: the quality of the photo is}
-for the corresponding tasks.
+\noindent\textit{Prompt initialization.}
+CoOp-style and KgCoOp-style use the suffixes \texttt{person aged \{grade\} years} for age, \texttt{\{grade\}} for HCI, and \texttt{\{grade\} image quality} for KonIQ.
+OrdinalCLIP-style uses the task-specific initialization strings ``age estimation: the age of the person is'' for age tasks, ``historical dating: a photo taken in the'' for HCI, and ``aesthetics assessment: the quality of the photo is'' for KonIQ.
 \end{minipage}
 \endgroup
 \end{table*}
@@ -112,7 +105,7 @@ The main benchmarks are Adience~\cite{eidinger2014age} ($K=8$), HCI~\cite{palerm
 Each image has one ordered grade and is evaluated against the full $K$-class label space.
 Test sizes per seed are 4,377, 198--199, 14,356, and 2,010, respectively.
 
-KonIQ grades are training-split MOS quintiles with cut points 2.70164182874463, 3.13852266805628, 3.41666666666667, and 3.64.
+KonIQ grades are training-split MOS quintiles with cut points 2.7016, 3.1385, 3.4167, and 3.6400.
 Table~\ref{tab:supp_f_prompts} gives the exact reference templates and ordered grade strings.
 Learned-context and ordinal-prompt configurations retain the same grade identities as their zero-shot references.
 
@@ -129,6 +122,7 @@ SORD uses distance-based soft ordinal labels~\cite{diaz2019sord}, here
 $q_j\propto\exp[-(j-y)^2/2]$ over all $K$ grades.
 M3 combines visual low-rank adaptation (LoRA)~\cite{hu2022lora} with a residual head.
 TEXT\_ONLY trains the visual LoRA independently with the residual head disabled and text embeddings frozen.
+Its name refers to scoring with the frozen text prototypes alone, without M3's residual head.
 
 In Table~\ref{tab:supp_f_adapters}, $f$ is the unit frozen-image feature, $p_k$ and $p_k^0$ are adapted and reference unit text features, and $P$ stacks reference text features as rows.
 The adapted visual feature is $z_\theta$, and $h_k$ is the residual-head output for grade $k$.
@@ -231,6 +225,8 @@ The ranking intervals in Fig.~\ref{fig:supp_config_curves} and Table~\ref{tab:su
 Both methods use the same resampled test groups.
 Adience groups follow the supplied \texttt{user\_id} metadata; HCI, FairFace, and KonIQ use content-proxy groups.
 These intervals are pointwise.
+
+For DDR, content-proxy groups are used because patient identifiers are unavailable.
 
 The counts 34/36 and 35/36 denote positive point estimates across adapter--dataset settings for all masks and interior masks, respectively, at the original strength.
 The count 59/64 denotes nonzero dataset--strength comparisons whose paired pointwise 95\% intervals lie above zero.
