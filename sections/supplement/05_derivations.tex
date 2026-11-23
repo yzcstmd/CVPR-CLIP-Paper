@@ -1,0 +1,72 @@
+\section{Derivations and Inference Algorithm}
+\label{sec:supp_derivations}
+
+We give the derivations behind the four propositions in the main paper and a single inference procedure. Throughout, $T$ denotes aligned zero-shot scores, $S$ the adapted scores, and $D=S-T$.
+
+\subsection{Calibration and the Blending Family}
+\label{sec:supp_calibration_proofs}
+
+\noindent\textbf{Proposition 1: ranking invariance.}
+For a fixed grade pair $(m,n)$ and scores $Z$, let $g^Z_{mn}(x)=Z_m(x)-Z_n(x)$.
+A common positive scale $a$ and image-independent class biases $b$ give
+\begin{equation}
+ g^{aZ+b}_{mn}(x)=a\,g^Z_{mn}(x)+b_m-b_n.
+ \label{eq:supp_affine_margin}
+\end{equation}
+This is strictly increasing in the original margin. Every comparison between two images, including ties, is preserved, and so is pair AUROC. The missing-grade bias $c$ is the special case $b_k=c\mathbf1[k\in\mathcal U]$.
+
+\noindent\textbf{Proposition 2: the blending family.}
+With $B_\lambda=T+\lambda D$ and $\Delta T_{mn}=T_m-T_n$, $\Delta D_{mn}=D_m-D_n$, calibration after blending produces
+\begin{equation}
+ g^{aB_\lambda+b}_{mn}
+ =a(\Delta T_{mn}+\lambda\Delta D_{mn})+b_m-b_n.
+ \label{eq:supp_blend_margin}
+\end{equation}
+Thus, for a fixed pair, calibration does not add rankings to the path indexed by $\lambda$. The reference is $\lambda=0$, and the adapted model is $\lambda=1$.
+
+\subsection{Properties of the Inheritance Operator}
+\label{sec:supp_operator_proofs}
+
+Let $\mathcal Y=\{1,\ldots,K\}$ and fix a missing set $\mathcal U$ with a nonempty set of seen anchors $\mathcal O=\mathcal Y\setminus\mathcal U$. For each missing grade $m$, let $\ell(m)$ and $r(m)$ be its nearest seen grades below and above it, when available; $n(m)$ denotes the sole available anchor. Let $w_{mj}$ be $1/2$ on its two nearest bracketing seen grades, or $1$ on its sole available seen anchor, and zero otherwise. Then $\sum_{j\in\mathcal O}w_{mj}=1$ and
+\begin{equation}
+[\mathcal L_{\mathcal U}(D)]_k=
+\begin{cases}
+ D_k,&k\in\mathcal O,\\
+ \sum_{j\in\mathcal O}w_{kj}D_j,&k\in\mathcal U.
+\end{cases}
+\label{eq:supp_operator_linear}
+\end{equation}
+
+\noindent\textbf{Proposition 3: structural properties.}
+The first branch gives $S_k^{\mathrm{TIE}}=S_k$ for seen $k$. At a missing endpoint $m$ with nearest seen grade $n$, the sole weight is $w_{mn}=1$, hence
+$g^{S^{\mathrm{TIE}}}_{mn}=(T_m+D_n)-(T_n+D_n)=g^T_{mn}$.
+The weights are fixed by the grade mask, so $\mathcal L_{\mathcal U}$ is linear and $\mathcal L_{\mathcal U}(\lambda D)=\lambda\mathcal L_{\mathcal U}(D)$. These identities prove seen-score preservation, endpoint margin recovery, and commutation with global blending. A subsequent constant class bias retains the endpoint's pairwise ranking.
+
+\noindent\textbf{Proposition 4: inheritance error.}
+Consider the FullSup displacement $D^{\mathrm{FS}}$ at an interior grade $m$ with seen neighbors $m-1$ and $m+1$. Suppressing the image argument, its error after inheritance is
+\begin{equation}
+ e_m=-\tfrac12\bigl(D^{\mathrm{FS}}_{m-1}-2D^{\mathrm{FS}}_m+D^{\mathrm{FS}}_{m+1}\bigr).
+ \label{eq:supp_curvature_proof}
+\end{equation}
+For every seen $n$, the FullSup and FS--TIE $m$--$n$ margins differ by exactly $e_m(x)$, since the seen-grade score is unchanged. If $e_m$ is constant across images, the difference is a class-pair offset and leaves ranking unchanged by Proposition 1. Section~\ref{sec:supp_inheritance_error} measures the constant and image-dependent components.
+
+\subsection{Inference Algorithm and Cost}
+\label{sec:supp_inference}
+
+The grade mask determines all anchors before inference. The bias $c^*$ is selected once from seen-grade validation images under the main paper's common error budget; its candidate grid and selection rule are specified in Sec.~F.4. For a test image, the complete score operation is:
+
+\noindent\textbf{TIE inference.}
+\begin{algorithmic}[1]
+ \Require Scores $T(x),S(x)$; mask $\mathcal U$; offset $c^*$
+ \State $D\gets S(x)-T(x)$; $Z\gets S(x)$
+ \For{$m\in\mathcal U$}
+  \If{both $\ell(m)$ and $r(m)$ exist}
+   \State $Z_m\gets T_m(x)+\tfrac12(D_{\ell(m)}+D_{r(m)})$
+  \Else
+   \State $Z_m\gets T_m(x)+D_{n(m)}$ (sole anchor)
+  \EndIf
+ \EndFor
+ \State \Return $\displaystyle\arg\max_{k\in\mathcal Y}\{Z_k+c^*\mathbf1[k\in\mathcal U]\}$
+\end{algorithmic}
+
+The anchor map takes $O(K)$ preprocessing time. Computing $D$, inheriting all missing coordinates, and selecting the final grade each take $O(K)$ time per image and $O(K)$ score storage. These costs exclude obtaining $T$ and $S$ from the encoders. TIE introduces no trainable parameters.
