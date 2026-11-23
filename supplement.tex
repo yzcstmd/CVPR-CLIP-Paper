@@ -1,0 +1,23 @@
+% Standalone supplementary build; the main paper and its legacy protocol fragment
+% remain unchanged. Compile from the repository root with pdfLaTeX/latexmk.
+\documentclass[10pt,twocolumn,letterpaper]{article}
+\usepackage[review]{cvpr}
+\input{preamble}
+% graphicx, amsmath, and booktabs are already provided by cvpr.sty.
+\usepackage{tabularx}
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
+\hypersetup{pdfauthor={},pdftitle={Supplementary Material}}
+\def\confName{CVPR}
+\def\confYear{2027}
+\title{Supplementary Material}
+\author{Anonymous Authors}
+
+\begin{document}
+\maketitle
+\appendix
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\theequation}{S\arabic{equation}}
+\input{sections/supplement/01_navigation_and_a}
+\end{document}
