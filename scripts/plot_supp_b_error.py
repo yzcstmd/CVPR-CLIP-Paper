@@ -99,6 +99,7 @@ for values, offset, color, marker, label in [
             if value == 0 or abs(value) >= 5e-5
             else f"{value:+.1e}"
         )
+        text = text.replace("-", "−")
         ax.annotate(
             text, (value, row), xytext=(4, 0),
             textcoords="offset points", va="center",

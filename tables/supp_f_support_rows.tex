@@ -1,7 +1,39 @@
-\parbox[t]{0.24\columnwidth}{Fixed-total\\Adience} & Pre-mask balanced $256$-image same-seed train-only pool; each target grade has quota 32. For $r>0$, keep $\max(1,\lceil r q_k\rceil)$ per target; $0\%$ keeps none. With $M=|\mathcal U|\in\{1,2\}$, target totals $(0,4M,7M)$ at $0/10/20\%$; seen totals $(256,256-4M,256-7M)$, round-robin removal; total always $256$. Same six masks and seeds $101/202/303$. \\
-\parbox[t]{0.24\columnwidth}{Fixed-total\\HCI} & Pre-mask balanced $256$-image same-seed train-only pool; each target grade has quota 52 for display grade 1, 51 otherwise. For $r>0$, keep $\max(1,\lceil r q_k\rceil)$ per target; $0\%$ keeps none. With $M=|\mathcal U|\in\{1,2\}$, target totals $(0,6M,11M)$ at $0/10/20\%$; seen totals $(256,256-6M,256-11M)$, round-robin removal; total always $256$. Same six masks and seeds $101/202/303$. \\
-\parbox[t]{0.24\columnwidth}{Fixed-total\\FairFace} & Pre-mask balanced $256$-image same-seed train-only pool; each target grade has quota 29 for display grades 1--4, 28 otherwise. For $r>0$, keep $\max(1,\lceil r q_k\rceil)$ per target; $0\%$ keeps none. With $M=|\mathcal U|\in\{1,2\}$, target totals $(0,3M,6M)$ at $0/10/20\%$; seen totals $(256,256-3M,256-6M)$, round-robin removal; total always $256$. Same six masks and seeds $101/202/303$. \\
-\parbox[t]{0.24\columnwidth}{Fixed-total\\KonIQ} & Pre-mask balanced $256$-image same-seed train-only pool; each target grade has quota 52 for display grade 1, 51 otherwise. For $r>0$, keep $\max(1,\lceil r q_k\rceil)$ per target; $0\%$ keeps none. With $M=|\mathcal U|\in\{1,2\}$, target totals $(0,6M,11M)$ at $0/10/20\%$; seen totals $(256,256-6M,256-11M)$, round-robin removal; total always $256$. Same six masks and seeds $101/202/303$. \\
-\parbox[t]{0.24\columnwidth}{Fixed-seen\\Adience} & Same pre-mask $256$-image pool, $q_k=32$; target per grade $(0,4,7)$ at $0/10/20\%$. Single target: seen $224$ fixed, total $(224,228,231)$; double targets: seen $192$ fixed, target totals $(0,8,14)$, total $(192,200,206)$. Exact seen image IDs retained; own matched $0\%$ run; all six masks and seeds $101/202/303$. \\
-\parbox[t]{0.24\columnwidth}{Fixed-seen\\HCI} & Same pre-mask pool, $q_1=52$, other $q_k=51$; target per grade $(0,6,11)$. At $0/10/20\%$: low endpoint, seen $204$, totals $(204,210,215)$; middle/high, seen $205$, totals $(205,211,216)$; adjacent/nonadjacent, seen $154$, target totals $(0,12,22)$, totals $(154,166,176)$; both endpoints, seen $153$, totals $(153,165,175)$. Seen IDs fixed; own matched $0\%$; seeds $101/202/303$. \\
+\textbf{(a) Pool quotas and target counts}\par
+\smallskip
+\begin{tabularx}{\columnwidth}{
+  @{}
+  >{\raggedright\arraybackslash}p{0.22\columnwidth}
+  >{\raggedright\arraybackslash}X
+  >{\centering\arraybackslash}p{0.22\columnwidth}
+  @{}
+}
+\toprule
+Task & Pool quota & 0/10/20\%\\
+\midrule
+Adience & 32 per grade & 0/4/7\\
+HCI / KonIQ & 52 for grade 1; 51 otherwise & 0/6/11\\
+FairFace & 29 for grades 1--4; 28 otherwise & 0/3/6\\
 \bottomrule
+\end{tabularx}
+
+\medskip
+\textbf{(b) Fixed-seen sample totals}\par
+\smallskip
+\begin{tabularx}{\columnwidth}{
+  @{}
+  >{\raggedright\arraybackslash}X
+  r
+  >{\centering\arraybackslash}p{0.36\columnwidth}
+  @{}
+}
+\toprule
+Task and target pattern & Seen & Total: 0/10/20\%\\
+\midrule
+Adience, one grade & 224 & 224/228/231\\
+Adience, two grades & 192 & 192/200/206\\
+HCI, low endpoint & 204 & 204/210/215\\
+HCI, middle or high & 205 & 205/211/216\\
+HCI, adjacent or separated pair & 154 & 154/166/176\\
+HCI, both endpoints & 153 & 153/165/175\\
+\bottomrule
+\end{tabularx}

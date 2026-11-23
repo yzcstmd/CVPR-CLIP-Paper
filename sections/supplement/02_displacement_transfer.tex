@@ -55,7 +55,9 @@ g^{\mathrm{ref}}_{mn}
 Returning one score to zero-shot therefore does not restore the zero-shot pair margin.
 The seen grade still carries its image-dependent displacement.
 At an endpoint, TIE removes this asymmetry by sharing $D_n$ while preserving $T_m$.
-The reference and the inherited displacement play distinct roles: one retains grade identity, while the other transfers adaptation.
+Setting the missing-grade displacement to zero lowers MS-AUC on all four datasets, despite reducing Missing MAE (Table~\ref{tab:supp_operator_comparison}).
+TIE achieves higher MS-AUC and lower Missing MAE than both Reference-only and direct score interpolation on every dataset.
+These controls show why TIE combines the grade's own reference with its neighbors' displacement.
 
 \subsection{Neighbor Selection and Inheritance Weights}
 \label{sec:supp_inheritance_rules}
@@ -70,11 +72,10 @@ They differ within missing blocks.
 
 One-sided inheritance exactly restores the zero-shot margin against its chosen anchor.
 Two-sided inheritance additionally retains the contrast between the anchors: against the left anchor, $g^{\mathrm{TIE}}_{m\ell}=g^T_{m\ell}+\tfrac12(D_r-D_\ell)$.
-Table~\ref{tab:supp_operator_comparison} evaluates these choices across the nine main-paper adapter configurations.
-Direct score interpolation uses exactly the same anchor weights as TIE, isolating the effect of preserving the grade's own reference.
-Reference-only isolates the effect of supplying a displacement.
-The left-, right-, and distance-weighted variants change the source or the mixture of that displacement.
-Class-bias calibration leaves the MS-AUC comparison unchanged; the accompanying MAE values describe the scores before calibration.
+Table~\ref{tab:supp_operator_comparison} compares these rules using the same scores, masks, and test images.
+The choice of anchor matters: right-anchor inheritance is strongest on Adience, whereas TIE achieves higher MS-AUC than either one-sided rule on FairFace and KonIQ.
+Distance weighting remains close to equal weights in the all-mask average, while the block analysis reveals where they differ.
+MS-AUC measures the ranking effect; Missing MAE reports the resulting decisions before calibration.
 
 \begin{table*}[t]
 \centering
@@ -173,4 +174,6 @@ The first term changes only the inherited coordinates within the FullSup model.
 The second captures the change in anchors and seen scores between full-support and missing-grade adaptation.
 Figure~\ref{fig:supp_error_diagnostic}b reports both signed terms.
 For a missing endpoint and its nearest seen anchor, both inherited constructions recover the same zero-shot margin, forcing $A=0$.
-The two main-paper propositions therefore serve complementary roles: Proposition~4 characterizes the inheritance error, and Proposition~1 identifies the part that can affect ranking.
+Across dataset means, the inheritance term is larger in magnitude than the model-change term.
+On HCI, the two terms are 0.126 and $-0.004$, respectively: most of the remaining mean FullSup--TIE gap lies in inheritance within the full-support model.
+Proposition~4 characterizes this error, and Proposition~1 identifies the component that can change ranking.

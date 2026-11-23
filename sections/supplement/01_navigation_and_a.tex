@@ -12,7 +12,7 @@ The remaining sections establish how transfer depends on supervision, extend the
 \textbf{F} & Configurations, prompts, and evaluation protocols.
 \end{tabularx}
 
-\noindent The main comparisons are in Secs.~A.2, A.3, and B.1.
+\noindent The central comparisons are in Secs.~\ref{sec:supp_best_blend}--\ref{sec:supp_error_tradeoffs} and \ref{sec:supp_keep_inherit}; Sec.~\ref{sec:supp_inheritance_error} explains the remaining inheritance error.
 
 \section{Beyond Global Blending}
 \label{sec:supp_blending}
@@ -24,6 +24,7 @@ We examine this distinction across adapter configurations and at the best evalua
 \label{sec:supp_config_curves}
 
 Let $T$ and $S$ denote the zero-shot and adapted scores, and let $D=S-T$.
+Global score blending provides an output-space counterpart to zero-shot/fine-tuned weight interpolation~\cite{wortsman2022robust}.
 At strength $\lambda$, the two score constructions are
 \begin{equation}
 \begin{aligned}
@@ -70,7 +71,6 @@ The intervals cross zero at $\lambda=0.1,0.2$ on Adience and $\lambda=0.2,0.3$ o
 We next give Blend its best strength on the grid, chosen separately for each dataset using test MS-AUC and shared across all nine configurations.
 TIE remains at $\lambda=1$.
 On HCI, FairFace, and KonIQ, it exceeds even this best Blend by 0.042, 0.018, and 0.067, respectively.
-The comparison allows Blend to select its most favorable evaluated strength while keeping TIE at the original strength.
 TIE also exceeds the zero-shot reference on these three benchmarks by 0.113, 0.025, and 0.096.
 Its gains therefore go beyond recovering the reference order.
 

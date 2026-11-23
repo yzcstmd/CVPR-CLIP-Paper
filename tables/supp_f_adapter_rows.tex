@@ -1,10 +1,75 @@
-CoOp-style & Train shared 4-token context, init \texttt{a photo of a}; fixed lexical ranks; CLIP encoders frozen. $S_k=100 f^\top p_k$, unit image/text vectors; CE. SGD $0.002$, momentum $0.9$, decay $0$, batch $32$, cosine $100$ epochs; minimum seen NLL at epoch $50/100$, earliest ties. Grade suffixes: age \texttt{person aged \{grade\} years}, HCI \texttt{\{grade\}}, KonIQ \texttt{\{grade\} image quality}. \\
-OrdinalCLIP-style & Train context and three base rank tokens (one each), official linear rank interpolation; CLIP encoders frozen. $S_k=100 f^\top p_k$; author CE$+$text-to-image KL ($1{:}1$). Adam $10^{-4}$, decay $0$, batch $32$, $50$ epochs; LR $\times0.1$ at $30$ (age) or $25,35$ (HCI/KonIQ); minimum seen NLL each epoch, earliest ties. Tokenized context init: age \texttt{age estimation: the age of the person is}; HCI \texttt{historical dating: a photo taken in the}; KonIQ \texttt{aesthetics assessment: the quality of the photo is}. \\
-KgCoOp-style & CoOp context, fixed ranks, score and frozen encoders above; CE$+\frac{8}{K}\sum_k\|p_k-p_k^0\|_2^2$ over all $K$ normalized texts. SGD $0.002$, momentum $0.9$, decay $0$, batch $32$, cosine $100$ epochs; minimum seen NLL at $50/100$, earliest ties. This is the main KgCoOp-style recipe. \\
-TaskRes-style (CE) & Train zero-initialized $K\!\times\!512$ prototype residual $\Delta W$ only; CLIP frozen. $S=100 f\,\mathrm{norm}(P+0.5\Delta W)^\top$; CE. Adam LR $\{0.0002,0.002\}$, $\epsilon=10^{-8}$, decay $0$, batch $32$; cosine $60$ epochs, first epoch $10^{-5}$; cap $60$, patience $10$. Minimum seen NLL across epochs/LRs; earlier exact ties. \\
-TaskRes-style (SORD) & TaskRes residual, scoring and frozen encoders above; same Adam, LR, batch, schedule and checkpoint rules. Training uses soft CE with $q_j\propto\exp[-(j-y)^2/2]$ over all $K$ grades ($\sigma=1$); validation remains hard-label NLL. \\
-Tip-Adapter-F (CE) & Train unconstrained support keys $W$, initialized by unit image features; fixed one-hot values $V$ and CLIP encoders. $S=T+\alpha\exp[-\beta(1-fW^\top)]V$. AdamW LR $\{0.0001,0.001\}$, $\epsilon=10^{-4}$, decay $0.01$, batch $32$, cosine $60$; cap $60$, patience $10$. Fit at $\alpha=1$, $\beta=5.5$; retain minimum seen-NLL epoch per LR, then select LR/$\alpha\in\{0.1,1,10\}$/$\beta\in\{1,2,5.5\}$ jointly by seen NLL; first in ascending LR/$\alpha$/$\beta$ order on exact ties. \\
-Tip-Adapter-F (SORD) & Tip-F keys, values, frozen encoders, score, AdamW and checkpoint/grid settings above; all-$K$ soft CE target $q_j\propto\exp[-(j-y)^2/2]$ ($\sigma=1$); hard-label seen NLL for validation. \\
-M3 & Image input; rank-$8$ LoRA on the last visual attention QKV/output weights and a $512\!\to\!128\!\to\!K$ GELU residual head. Base CLIP/text frozen. $S_k=100 z_\theta^\top p_k^0+h_k$; head input centered/scaled by native train mean/RMS. CE; AdamW visual $10^{-4}$/head $10^{-3}$, decay $10^{-3}$, batch $32$, cap $60$, patience $10$; minimum seen NLL, earliest ties. $T$ uses the unadapted image encoder. \\
-\texttt{TEXT\_ONLY} & Independent image-input visual LoRA fit as M3; residual head frozen/gated off, text frozen. $S_k=100 z_\theta^\top p_k^0$, distinct from frozen $T$. CE; AdamW $10^{-4}$, decay $10^{-3}$, batch $32$, cap $60$, patience $10$; minimum seen NLL, earliest ties. \\
+CoOp-style &
+Shared four-token context initialized with \texttt{a photo of a}; fixed lexical ranks.
+$S_k=100f^\top p_k$; CE. &
+SGD, learning rate 0.002, momentum 0.9, weight decay 0.
+Cosine schedule for 100 epochs.
+Select minimum NLL at epochs 50 and 100; earlier checkpoint on ties.\\
+\addlinespace[2pt]
+
+OrdinalCLIP-style &
+Learned context and three base rank tokens, one token per base rank; linear rank interpolation~\cite{li2022ordinalclip}.
+$S_k=100f^\top p_k$.
+CE plus text-to-image KL divergence with equal weights. &
+Adam, learning rate $10^{-4}$, weight decay 0, 50 epochs.
+Multiply learning rate by 0.1 at epoch 30 for age tasks, and at epochs 25 and 35 for HCI/KonIQ.
+Select minimum NLL over epochs; earlier checkpoint on ties.\\
+\addlinespace[2pt]
+
+KgCoOp-style &
+CoOp components and score.
+Objective:
+$\mathrm{CE}+\frac{8}{K}\sum_{k=1}^{K}\|p_k-p_k^0\|_2^2$,
+using all $K$ normalized text features. &
+Same SGD, cosine schedule, checkpoint candidates, and selection rule as CoOp-style.\\
+\addlinespace[2pt]
+
+TaskRes-style (CE) &
+Only a zero-initialized $K\times512$ prototype residual $\Delta W$ is trained.
+$S=100\operatorname{norm}(P+0.5\Delta W)f$.
+CE. &
+Adam with learning rate in $\{0.0002,0.002\}$, $\epsilon=10^{-8}$, weight decay 0.
+Cosine schedule, maximum 60 epochs; first-epoch learning rate $10^{-5}$; patience 10.
+Select minimum NLL across epochs and learning rates, retaining the earlier candidate on exact ties.\\
+\addlinespace[2pt]
+
+TaskRes-style (SORD) &
+Same prototype residual and score as TaskRes-style (CE); SORD supervision. &
+Same optimization and selection as TaskRes-style (CE).\\
+\addlinespace[2pt]
+
+Tip-Adapter-F (CE) &
+Unconstrained support keys $W$, initialized with unit image features; fixed one-hot values $V$.
+$S=T+\alpha V^\top\exp[-\beta(\mathbf1-Wf)]$.
+The exponential is elementwise; CE. &
+AdamW with learning rate in $\{10^{-4},10^{-3}\}$, $\epsilon=10^{-4}$, weight decay 0.01.
+Cosine schedule, maximum 60 epochs; patience 10.
+Fit at $\alpha=1$, $\beta=5.5$.
+Retain the minimum-NLL epoch per learning rate, then select learning rate,
+$\alpha\in\{0.1,1,10\}$, and
+$\beta\in\{1,2,5.5\}$ jointly by NLL.
+Exact ties follow ascending learning-rate/$\alpha$/$\beta$ order.\\
+\addlinespace[2pt]
+
+Tip-Adapter-F (SORD) &
+Same keys, values, and score as Tip-Adapter-F (CE); SORD supervision. &
+Same optimization, checkpoint selection, and parameter grids as Tip-Adapter-F (CE).\\
+\addlinespace[2pt]
+
+M3 &
+Rank-8 LoRA on the final visual attention QKV and output weights, plus a $512\to128\to K$ GELU residual head.
+$S_k=100z_\theta^\top p_k^0+h_k$.
+The head input is centered and scaled using the native training mean and RMS.
+CE.
+$T$ uses the unadapted image encoder. &
+AdamW with visual learning rate $10^{-4}$ and head learning rate $10^{-3}$; weight decay $10^{-3}$.
+Maximum 60 epochs; patience 10.
+Select minimum NLL; earlier checkpoint on ties.\\
+\addlinespace[2pt]
+
+TEXT\_ONLY &
+An independent visual LoRA fit with the same visual construction as M3.
+The residual head is disabled and frozen; $S_k=100z_\theta^\top p_k^0$, distinct from frozen $T$; CE. &
+AdamW, learning rate $10^{-4}$, weight decay $10^{-3}$.
+Maximum 60 epochs; patience 10.
+Select minimum NLL; earlier checkpoint on ties.\\
 \bottomrule

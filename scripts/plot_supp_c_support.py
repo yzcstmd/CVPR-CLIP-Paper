@@ -131,7 +131,8 @@ handles = [
         color=color,
         marker="o",
         lw=1.1,
-        label=method
+        label={"CoOp": "CoOp-style", "OrdinalCLIP": "OrdinalCLIP-style",
+               "Tip-F": "Tip-Adapter-F (CE)"}[method]
     )
     for method, color in COLORS.items()
 ]

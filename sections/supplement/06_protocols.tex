@@ -1,132 +1,248 @@
 \section{Experimental Protocols and Reproducibility}
 \label{sec:supp_protocols}
 
+
 \subsection{Datasets, Labels, and Prompts}
 \label{sec:supp_data_prompts}
-
-The main benchmarks are Adience ($K=8$), HCI ($K=5$), FairFace ($K=9$), and KonIQ-10k ($K=5$). Each image has one ordered grade and is evaluated against the full $K$-class label space. Test sizes per seed are 4,377, 198--199, 14,356, and 2,010, respectively.
-
-The KonIQ labels are training-split MOS quintiles with cut points $2.70164182874463$, $3.13852266805628$, $3.41666666666667$, and $3.64$. The ordered grade words are \emph{bad}, \emph{poor}, \emph{fair}, \emph{good}, and \emph{excellent}. Its reference prompt is ``a photograph with \{grade\} image quality.''
-
-Table~\ref{tab:supp_f_prompts} gives the exact reference templates and ordered grade words for the evaluated tasks. Learned-context and ordinal-prompt constructions use the same grade identities as their corresponding zero-shot references.
 
 \begin{table}[!ht]
 \centering
 \caption{\textbf{Exact language interfaces.}
-Reference templates are reproduced verbatim, with grade strings in model-index order. SCUT and DDR are extension tasks.}
+Templates and grade strings are reproduced verbatim.
+Semicolons separate grade strings and are not inserted into the prompts.}
 \label{tab:supp_f_prompts}
-\scriptsize
-\begin{tabularx}{\columnwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\begingroup
+\fontsize{8}{9.5}\selectfont
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1}
+\begin{tabularx}{\columnwidth}{
+  @{}
+  >{\raggedright\arraybackslash}p{0.21\columnwidth}
+  >{\raggedright\arraybackslash}X
+  @{}
+}
 \toprule
-Task & Reference template & Ordered grade strings \\
+Task & Language interface\\
 \midrule
 \input{tables/supp_f_prompt_rows.tex}
 \end{tabularx}
+\endgroup
 \end{table}
+
+\begin{table*}[!t]
+\centering
+\caption{\textbf{Nine adapter configurations.}
+Trainable components, score constructions, objectives, and optimization.
+CE denotes cross-entropy; SORD uses the soft targets defined in Sec.~\ref{sec:supp_adapters}.
+All unspecified base CLIP parameters remain frozen.}
+\label{tab:supp_f_adapters}
+\begingroup
+\fontsize{8}{9.5}\selectfont
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1}
+\begin{tabularx}{\textwidth}{
+  @{}
+  >{\raggedright\arraybackslash}p{0.15\textwidth}
+  >{\raggedright\arraybackslash}p{0.36\textwidth}
+  >{\raggedright\arraybackslash}X
+  @{}
+}
+\toprule
+Configuration & Components, scores, and objective & Optimization and selection\\
+\midrule
+\input{tables/supp_f_adapter_rows.tex}
+\end{tabularx}
+
+\medskip
+\begin{minipage}{\textwidth}
+\textit{Prompt initialization.}
+CoOp-style and KgCoOp-style use the suffixes
+\texttt{person aged \{grade\} years} for age,
+\texttt{\{grade\}} for HCI, and
+\texttt{\{grade\} image quality} for KonIQ.
+OrdinalCLIP-style tokenizes
+\texttt{age estimation: the age of the person is},
+\texttt{historical dating: a photo taken in the}, and
+\texttt{aesthetics assessment: the quality of the photo is}
+for the corresponding tasks.
+\end{minipage}
+\endgroup
+\end{table*}
+
+\begin{table}[!t]
+\centering
+\caption{\textbf{Target-grade support allocations.}
+(a) Pre-mask quotas and per-target counts at 0/10/20\% support.
+Fixed-total has 256 images on all four tasks.
+(b) Fixed-seen totals on Adience and HCI.}
+\label{tab:supp_f_support}
+\begingroup
+\fontsize{8}{9.5}\selectfont
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1}
+\input{tables/supp_f_support_rows.tex}
+\endgroup
+\end{table}
+
+\begin{table}[!t]
+\centering
+\caption{\textbf{Validation-only selection.}
+All selectors use the bias grid and error budget in Sec.~\ref{sec:supp_calibration_protocol}.
+Blend strengths are $\lambda\in\{0,0.1,\ldots,1.5,2\}$.}
+\label{tab:supp_f_selectors}
+\begingroup
+\fontsize{8}{9.5}\selectfont
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1}
+\begin{tabularx}{\columnwidth}{
+  @{}
+  >{\raggedright\arraybackslash}p{0.19\columnwidth}
+  >{\raggedright\arraybackslash}X
+  @{}
+}
+\toprule
+Selector & Sequence and choice\\
+\midrule
+\input{tables/supp_f_selector_rows.tex}
+\end{tabularx}
+\endgroup
+\end{table}
+
+The main benchmarks are Adience~\cite{eidinger2014age} ($K=8$), HCI~\cite{palermo2012dating} ($K=5$), FairFace~\cite{karkkainen2021fairface} ($K=9$), and KonIQ-10k~\cite{hosu2020koniq} ($K=5$).
+Each image has one ordered grade and is evaluated against the full $K$-class label space.
+Test sizes per seed are 4,377, 198--199, 14,356, and 2,010, respectively.
+
+KonIQ grades are training-split MOS quintiles with cut points 2.70164182874463, 3.13852266805628, 3.41666666666667, and 3.64.
+Table~\ref{tab:supp_f_prompts} gives the exact reference templates and ordered grade strings.
+Learned-context and ordinal-prompt configurations retain the same grade identities as their zero-shot references.
+
 
 \subsection{Adapter Configurations}
 \label{sec:supp_adapters}
 
-All nine main configurations use OpenAI CLIP ViT-B/16 and produce aligned pre-softmax scores $S\in\mathbb R^K$ for the same grade vocabulary as zero-shot $T$. Table~\ref{tab:supp_f_adapters} states the learned components, supervision objective, score construction, and training settings for each configuration.
+All nine main configurations use OpenAI CLIP ViT-B/16~\cite{radford2021clip} and produce aligned pre-softmax scores for the same grade vocabulary.
+They cover learned context prompts~\cite{zhou2022coop}, ordinal rank prompts~\cite{li2022ordinalclip}, knowledge-preserving prompts~\cite{yao2023kgcoop}, prototype residuals~\cite{yu2023taskres}, and trainable cache adapters~\cite{zhang2022tipadapter}.
 
-The CE and SORD variants are separate configurations. The main matrix's KgCoOp-style implementation differs from the formula-matched KgCoOp control in Sec.~\ref{sec:supp_ordinal_adaptation}. M3 and \texttt{TEXT\_ONLY} refer to the actual score constructions used in the final evaluation.
 
-\begin{table}[!ht]
-\centering
-\caption{\textbf{Nine adapter configurations.}
-Trainable components, supervision, score construction, and training settings are taken from the fixed configurations used to produce the evaluated checkpoints.}
-\label{tab:supp_f_adapters}
-\scriptsize
-\begin{tabularx}{\columnwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
-\toprule
-Configuration & Implementation and training \\
-\midrule
-\input{tables/supp_f_adapter_rows.tex}
-\end{tabularx}
-\end{table}
+The CE and SORD configurations differ in their supervision targets.
+SORD uses distance-based soft ordinal labels~\cite{diaz2019sord}, here
+$q_j\propto\exp[-(j-y)^2/2]$ over all $K$ grades.
+M3 combines visual low-rank adaptation (LoRA)~\cite{hu2022lora} with a residual head.
+TEXT\_ONLY trains the visual LoRA independently with the residual head disabled and text embeddings frozen.
+
+In Table~\ref{tab:supp_f_adapters}, $f$ is the unit frozen-image feature, $p_k$ and $p_k^0$ are adapted and reference unit text features, and $P$ stacks reference text features as rows.
+The adapted visual feature is $z_\theta$, and $h_k$ is the residual-head output for grade $k$.
+The operator $\operatorname{norm}$ normalizes matrix rows.
+For cache adapters, $W$ contains support keys and $V$ their one-hot grade values.
+
+All configurations use batch size 32.
+Checkpoint and hyperparameter selection use hard-label negative log-likelihood (NLL) on seen-grade validation images.
+The main KgCoOp-style recipe differs from the formula-matched control in Sec.~\ref{sec:supp_ordinal_adaptation}.
+
 
 \subsection{Missing Masks and Support Budgets}
 \label{sec:supp_f_masks}
 
-The six missing-grade masks are lowest, middle, highest, two adjacent, two nonadjacent, and both endpoints. Their exact one-based indices are given in Table~\ref{tab:supp_missing_masks}. These are class masks, not image occlusions.
+The six missing-grade masks are listed in Table~\ref{tab:supp_missing_masks}.
+The main protocol uses seeds 101, 202, and 303, with 256 training and 64 validation images drawn only from seen grades.
+Counts are balanced across the $K-|\mathcal U|$ seen grades, differing by at most one image.
+Every test split retains all $K$ grades.
+The main matrix therefore contains $9\times4\times6\times3=648$ conditions.
 
-The main protocol uses seeds 101, 202, and 303, with 256 labeled training images and 64 validation images in total, both drawn only from seen grades. Counts are balanced across the $K-|\mathcal U|$ seen grades, differing by at most one image. Every test split retains all $K$ grades. Nine configurations, four tasks, six masks, and three seeds therefore yield 648 conditions.
+The support experiments start from a same-seed, balanced, 256-image training-only pool.
+Let $n_k^{\mathrm{pool}}$ be the pre-mask quota of target grade $k$.
+At support fraction $r$, its sample count is
+$n_k(0)=0$ and
+$n_k(r)=\max(1,\lceil r n_k^{\mathrm{pool}}\rceil)$ for $r>0$.
+Thus, 10\% and 20\% refer to the target grade's pool quota.
 
-The support experiments use target-grade fractions 0\%, 10\%, and 20\%. Fixed-total reallocates the original training budget. Fixed-seen retains the original seen-grade images while adding target-grade support. Table~\ref{tab:supp_f_support} specifies the exact denominators and sample counts for both protocols.
+Fixed-total keeps 256 images by removing seen-grade images in round-robin order as target images are added.
+Its target and seen counts are
+$\sum_{k\in\mathcal U}n_k(r)$ and
+$256-\sum_{k\in\mathcal U}n_k(r)$.
+Fixed-seen retains the exact seen-image IDs from the masked pool and adds target images, using its own matched 0\% baseline.
+Both protocols use the six masks and three seeds above.
+Table~\ref{tab:supp_f_support} gives all sample allocations.
 
-\begin{table}[!ht]
-\centering
-\caption{\textbf{Target-grade support definitions.}
-Exact denominators and sample counts for the fixed-total and fixed-seen protocols.}
-\label{tab:supp_f_support}
-\scriptsize
-\begin{tabularx}{\columnwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
-\toprule
-Protocol and task & Definition and sample counts \\
-\midrule
-\input{tables/supp_f_support_rows.tex}
-\end{tabularx}
-\end{table}
 
 \subsection{Scores, Calibration, and Blend Selection}
 \label{sec:supp_calibration_protocol}
 
-All methods use scores with aligned grade indices and a common pre-softmax scale; $D=S-T$ is computed before class-bias calibration. For a score construction $Z$, calibrated prediction uses
+All score constructions use aligned grade indices and a common pre-softmax scale.
+The displacement $D=S-T$ is computed before calibration.
+Missing-grade calibration adds a class bias, following the calibrated-stacking formulation~\cite{chao2016gzsl}.
+For scores $Z$, prediction uses
 $\arg\max_k\{Z_k(x)+c_Z^*\mathbf1[k\in\mathcal U]\}$.
 
-The seen-validation budget uses normalized mean absolute error,
+The validation budget uses normalized mean absolute error,
 \begin{equation}
 \operatorname{nMAE}_{\mathrm{seen}}(Z)
 =
 \frac{1}{N_{\mathrm{val}}(K-1)}
 \sum_{i\in\mathrm{val}}
-|\hat y_Z(x_i)-y_i|.
+|\hat y_Z(x_i)-y_i|,
 \label{eq:supp_f_nmae}
 \end{equation}
-The selected offset is the largest feasible candidate satisfying
-$\operatorname{nMAE}_{\mathrm{seen}}(Z+c_Z^*\mathbf1_{\mathcal U})
-\leq
-\operatorname{nMAE}_{\mathrm{seen}}(S)+0.005$.
-Each calibrated method selects its own offset.
+where $N_{\mathrm{val}}$ is the number of seen-grade validation images.
+A bias is feasible when
+$\operatorname{nMAE}_{\mathrm{seen}}(Z+c\mathbf1_{\mathcal U})
+\le
+\operatorname{nMAE}_{\mathrm{seen}}(S)+0.005$,
+with numerical tolerance $10^{-15}$.
 
-Blend-S chooses a strength on seen validation and then calibrates it. Blend-A calibrates each candidate strength before validation selection. Table~\ref{tab:supp_f_selectors} reports the exact candidate sets, objectives, tie rules, and infeasible-candidate handling.
+For validation image $i$, define
+$v_i(Z)=\max_{k\in\mathcal O}Z_k(x_i)-\max_{k\in\mathcal U}Z_k(x_i)$.
+The shared condition-specific grid uses
+$\mathcal V=\{v_i(S),v_i(S^{\mathrm{TIE}}):i\in\mathrm{val}\}$,
+with
+$c_{\min}=\lfloor\min\mathcal V\rfloor-1$,
+$c_{\max}=\lceil\max\mathcal V\rceil+1$, and
+$\mathcal C=\{-\infty\}\cup\{c_{\min},c_{\min}+1,\ldots,c_{\max}\}$.
+Each path selects its own largest feasible bias.
+An empty feasible set is reported as infeasible.
+Full-$K$ argmax ties select the lowest grade.
 
-\begin{table}[!ht]
-\centering
-\caption{\textbf{Validation-only selection.}
-Candidate grids, optimization objectives, tie-breaking, and infeasible-candidate handling follow the fixed evaluation implementation.}
-\label{tab:supp_f_selectors}
-\scriptsize
-\begin{tabularx}{\columnwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
-\toprule
-Selector & Exact candidate set and selection rule \\
-\midrule
-\input{tables/supp_f_selector_rows.tex}
-\end{tabularx}
-\end{table}
+Table~\ref{tab:supp_f_selectors} specifies the two Blend selectors.
+Both use seen validation only.
+The best Blend in Sec.~\ref{sec:supp_best_blend} is instead the retrospective test maximum on the 17-point grid.
+FullSup retains the same total 256/64 training/validation budgets, distributed across all $K$ grades.
 
-The matched-strength ranking analysis evaluates the fixed grid
-$\lambda\in\{0,0.1,\ldots,1.5,2\}$.
-Its best Blend curve is selected retrospectively on test results, not used as a deployment choice. FullSup retains the same total 256/64 budgets but uses labeled training and validation images from all $K$ grades.
 
 \subsection{Metrics, Aggregation, and Uncertainty}
 \label{sec:supp_f_metrics}
 
-For each adjacent missing--seen pair $(m,n)$, pair AUROC ranks images by $Z_m-Z_n$, using only test images of those two true grades, with $m$ positive and ties counting one half. MS-AUC is the arithmetic mean over the adjacent missing--seen pairs.
+For each adjacent missing--seen pair $(m,n)$, pair AUROC ranks images by $Z_m-Z_n$, using test images of those two true grades, with $m$ positive and ties counting one half.
+MS-AUC is the arithmetic mean over these pairs.
+It is computed from finite pre-calibration scores; the $-\infty$ candidate is used only to suppress missing-grade predictions.
 
-Missing MAE first averages absolute grade error within each missing grade, then across missing grades. Seen and Overall MAE instead average over their respective test images. All MAEs are in grade units.
+Missing MAE first averages absolute grade error within each missing grade, then across missing grades.
+Seen and Overall MAE average over their respective test images.
+All MAEs are in grade units.
 
-Results first average over six masks and three seeds within each adapter--dataset setting, then equally over the nine configurations. The interior analysis uses only three masks.
+For the main adapter matrix, results first average over six masks and three seeds within each adapter--dataset setting, then equally over the nine configurations.
+The interior analysis uses three masks.
+Extension results use the masks, seeds, or folds stated in Sec.~\ref{sec:supp_generality}.
 
-Uncertainty uses 10,000 paired group-bootstrap replicates, resampling the same held-out groups for both methods with fixed checkpoints. Adience uses the recorded subject-group metadata; the other main tasks use their content-proxy groups. The intervals are pointwise and conditional on fitted checkpoints.
+FullSup gap closure is computed within each adapter--dataset setting before aggregation.
+A ratio is reported when the FullSup improvement over Adapted exceeds $10^{-8}$ and its original paired 95\% interval lies above zero.
+The only excluded MS-AUC ratio is TaskRes-style (SORD) on Adience.
 
-The counts 34/36, 35/36, and 59/64 refer to all-mask adapter--dataset gains at original strength, interior-mask gains at original strength, and nonzero interior matched-strength comparisons, respectively.
+The ranking intervals in Fig.~\ref{fig:supp_config_curves} and Table~\ref{tab:supp_best_blend} use 10{,}000 paired group-bootstrap replicates with fixed checkpoints.
+Both methods use the same resampled test groups.
+Adience groups follow the supplied \texttt{user\_id} metadata; HCI, FairFace, and KonIQ use content-proxy groups.
+These intervals are pointwise.
+
+The counts 34/36 and 35/36 denote positive point estimates across adapter--dataset settings for all masks and interior masks, respectively, at the original strength.
+The count 59/64 denotes nonzero dataset--strength comparisons whose paired pointwise 95\% intervals lie above zero.
 
 \subsection{Figure Construction and Implementation}
 \label{sec:supp_f_figures}
 
-The main paper's Fig.~1 uses KonIQ, CoOp-style adaptation, seed 101, and a missing middle grade. Grade 3 (\emph{fair}) is compared with seen grade 2 (\emph{poor}), using 411 and 401 test images. Pair AUROC is computed from the original per-image score margins. The displayed offsets are $c^*=6$ for Adapted and $c^*=0$ for TIE.
+The main paper's Fig.~1 uses KonIQ, CoOp-style adaptation, seed 101, and a missing middle grade.
+Grade 3 (\emph{fair}) is compared with seen grade 2 (\emph{poor}), using 411 and 401 test images.
+Pair AUROC is computed from the original per-image score margins.
+The displayed offsets are $c^*=6$ for Adapted and $c^*=0$ for TIE.
 
-The main paper's Fig.~2 uses 81 interior-mask conditions per dataset and the 17-point strength grid, with paired bootstrap intervals for TIE minus Blend. The measured margins and AUROC values come from the fixed test scores; the margin-shift illustration in Fig.~1b is schematic.
-
-Score post-processing costs $O(K)$ per image after obtaining $T$ and $S$. Encoder computation is outside this cost.
+The main paper's Fig.~2 uses 81 interior-mask conditions per dataset and the 17-point strength grid, with paired bootstrap intervals for TIE minus Blend.
+The margin-shift illustration in Fig.~1b is schematic.
+The score-processing algorithm and its $O(K)$ cost are given in Sec.~\ref{sec:supp_inference}.

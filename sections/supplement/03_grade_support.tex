@@ -6,7 +6,7 @@ We examine how ordinal transfer changes as target grades receive direct supervis
 \subsection{From Missing to Partially Observed Grades}
 \label{sec:supp_support_levels}
 
-TIE supplies adaptation to grades without direct training support. We next examine what happens when those grades begin to receive labeled images.
+TIE supplies adaptation to grades without direct training support.
 
 We use three support levels, 0\%, 10\%, and 20\%, under two protocols. The fixed-total protocol keeps the adaptation budget at 256 images while changing the target-grade support. The fixed-seen protocol retains the same seen-grade training images as target-grade support is added. These protocols give complementary views of supervision availability; their exact sample allocations are specified in Sec.~F.3.
 
@@ -16,7 +16,7 @@ Figure~\ref{fig:supp_support_levels} reports the MS-AUC gain of TIE over Adapted
 \centering
 \includegraphics[width=\textwidth]{figures/supp/supp_c_support_levels.pdf}
 \caption{\textbf{Sensitivity to grade-specific supervision.}
-Change in MS-AUC from Adapted to TIE at 0\%, 10\%, and 20\% target-grade support. Colors distinguish the three adaptation configurations. Solid lines use a fixed total training budget; dashed lines retain fixed seen-grade training images. Adience and HCI include both protocols, while FairFace and KonIQ use the fixed-total protocol. Each point is the mean under its corresponding protocol.}
+Change in MS-AUC from Adapted to TIE at 0\%, 10\%, and 20\% target-grade support. Colors distinguish the three adapter configurations. Solid lines use a fixed total training budget; dashed lines retain fixed seen-grade training images. Adience and HCI include both protocols, while FairFace and KonIQ use the fixed-total protocol. Each point is the mean under its corresponding protocol.}
 \label{fig:supp_support_levels}
 \end{figure*}
 
@@ -84,6 +84,8 @@ KonIQ & 1.446 & 0.883 & 0.938 & 111\% \\
 \end{tabular*}
 \end{table}
 
-For each adapter, gap closure compares the reduction from Adapted to TIE with the reduction from Adapted to FullSup. The corresponding MS-AUC gap-closure ratio is estimable in 35 of 36 adapter--dataset settings and has a median of 63\%.
+For each adapter--dataset setting, gap closure divides the improvement from Adapted to TIE by the improvement from Adapted to FullSup.
+All 36 Missing MAE ratios and 35 MS-AUC ratios satisfy the reporting rule in Sec.~\ref{sec:supp_f_metrics}; the latter have a median of 63\%.
 
-FullSup provides an empirical reference for direct grade-specific supervision at the same total training budget. Its labeled images and validation selection cover all grades, whereas TIE inherits adaptation without target-grade training images. Together, these comparisons show how the value of ordinal transfer depends on both the location and availability of supervision.
+FullSup uses one model per configuration and seed, evaluated on each mask's target grades.
+It provides a reference for direct supervision at the same total label budget, with training and validation images covering all grades.
