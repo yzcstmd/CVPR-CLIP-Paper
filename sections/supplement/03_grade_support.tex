@@ -1,0 +1,89 @@
+\section{Grade Support and Missing-Grade Structure}
+\label{sec:supp_grade_support}
+
+We examine how ordinal transfer changes as target grades receive direct supervision and as the location of missing grades varies. A budget-matched full-support model provides a reference for the adaptation recovered through inheritance.
+
+\subsection{From Missing to Partially Observed Grades}
+\label{sec:supp_support_levels}
+
+TIE supplies adaptation to grades without direct training support. We next examine what happens when those grades begin to receive labeled images.
+
+We use three support levels, 0\%, 10\%, and 20\%, under two protocols. The fixed-total protocol keeps the adaptation budget at 256 images while changing the target-grade support. The fixed-seen protocol retains the same seen-grade training images as target-grade support is added. These protocols give complementary views of supervision availability; their exact sample allocations are specified in Sec.~F.3.
+
+Figure~\ref{fig:supp_support_levels} reports the MS-AUC gain of TIE over Adapted. The study covers CoOp-style, OrdinalCLIP-style, and Tip-Adapter-F (CE). Adience and HCI are evaluated under both protocols; FairFace and KonIQ use the fixed-total protocol.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/supp/supp_c_support_levels.pdf}
+\caption{\textbf{Sensitivity to grade-specific supervision.}
+Change in MS-AUC from Adapted to TIE at 0\%, 10\%, and 20\% target-grade support. Colors distinguish the three adaptation configurations. Solid lines use a fixed total training budget; dashed lines retain fixed seen-grade training images. Adience and HCI include both protocols, while FairFace and KonIQ use the fixed-total protocol. Each point is the mean under its corresponding protocol.}
+\label{fig:supp_support_levels}
+\end{figure*}
+
+All 18 adapter--dataset--protocol trajectories show decreasing average ranking gains from 0\% to 10\% to 20\% support. The largest gains occur when target grades have no images of their own. Once direct supervision is introduced, inheritance contributes less additional information.
+
+The transition is especially clear on HCI. Under both protocols, all three configurations show negative incremental ranking gains at 10\% and 20\% support. Other tasks retain positive gains for several partially observed settings. The value of inherited displacement therefore changes with the amount of adaptation learned directly for a target grade.
+
+\subsection{Endpoints, Interior Grades, and Missing Blocks}
+\label{sec:supp_missing_structure}
+
+The main experiments use six missing-grade patterns. Table~\ref{tab:supp_missing_masks} gives their exact grade indices. The notation follows the main paper's one-based grade numbering. Three patterns omit interior grades; the other three involve the label-space endpoints.
+
+\begin{table}[t]
+\centering
+\caption{\textbf{Missing-grade patterns.}
+Grade indices are one-based. HCI and KonIQ share the same $K=5$ masks.}
+\label{tab:supp_missing_masks}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lccc@{}}
+\toprule
+Pattern & Adience & FairFace & HCI/KonIQ \\
+\midrule
+Low endpoint & $\{1\}$ & $\{1\}$ & $\{1\}$ \\
+Middle & $\{4\}$ & $\{5\}$ & $\{3\}$ \\
+High endpoint & $\{8\}$ & $\{9\}$ & $\{5\}$ \\
+Adjacent pair & $\{4,5\}$ & $\{4,5\}$ & $\{2,3\}$ \\
+Separated pair & $\{2,7\}$ & $\{2,8\}$ & $\{2,4\}$ \\
+Both endpoints & $\{1,8\}$ & $\{1,9\}$ & $\{1,5\}$ \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\noindent\textbf{Endpoint restoration.}
+For a missing endpoint $m$ and its nearest seen grade $n$, TIE copies $D_n$ and exactly recovers the zero-shot margin $T_m-T_n$. This property addresses a measurable adaptation loss. On endpoint patterns, Adapted falls below the zero-shot MS-AUC by 0.065, 0.028, 0.058, and 0.056 on Adience, HCI, FairFace, and KonIQ, respectively. TIE restores the reference ranking for the endpoint--neighbor comparisons.
+
+\noindent\textbf{Interior transfer.}
+With seen grades on both sides, inheritance retains information from their adapted displacements. At the original adaptation strength, TIE exceeds zero-shot interior MS-AUC by 0.113 on HCI, 0.025 on FairFace, and 0.096 on KonIQ. Thus, endpoint inheritance restores a reference margin, while interior inheritance can improve upon it.
+
+For consecutive missing grades, equal-weight inheritance gives every grade in the block the same displacement. Their pairwise displacement difference cancels, recovering the zero-shot order within the block. Distance-weighted inheritance instead preserves changes across the anchor interval. Section~\ref{sec:supp_inheritance_rules} analyzes this distinction.
+
+\subsection{Full-Support Reference}
+\label{sec:supp_fullsupport}
+
+We compare the masked models with FullSup, a budget-matched reference adapted using labeled images from every grade. FullSup uses 256 training images and 64 validation images in total, now distributed across the complete label space. The masked models use the same total budgets with no images from the missing grades.
+
+Table~\ref{tab:supp_fullsupport} reports uncalibrated missing-grade MAE. TIE closes 44--58\% of the Adapted--FullSup gap on Adience, HCI, and FairFace. On KonIQ, TIE exceeds the full-support reference in gap closure, with lower missing-grade MAE for eight of nine adapter configurations.
+
+\begin{table}[t]
+\centering
+\caption{\textbf{Missing-grade error relative to full support.}
+Uncalibrated Missing MAE ($\downarrow$), averaged over nine configurations and six masks with three seeds. Gap closed is first computed within each adapter and then averaged; it is not the ratio of the displayed means.}
+\label{tab:supp_fullsupport}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrrr@{}}
+\toprule
+Dataset & Adapted & TIE & FullSup & Closed \\
+\midrule
+Adience & 1.089 & 0.685 & 0.418 & 58\% \\
+HCI & 1.377 & 1.052 & 0.642 & 44\% \\
+FairFace & 1.071 & 0.696 & 0.417 & 56\% \\
+KonIQ & 1.446 & 0.883 & 0.938 & 111\% \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+For each adapter, gap closure compares the reduction from Adapted to TIE with the reduction from Adapted to FullSup. The corresponding MS-AUC gap-closure ratio is estimable in 35 of 36 adapter--dataset settings and has a median of 63\%.
+
+FullSup provides an empirical reference for direct grade-specific supervision at the same total training budget. Its labeled images and validation selection cover all grades, whereas TIE inherits adaptation without target-grade training images. Together, these comparisons show how the value of ordinal transfer depends on both the location and availability of supervision.
