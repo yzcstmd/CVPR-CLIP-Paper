@@ -1,0 +1,155 @@
+\section{Generality across Adaptation Regimes and Domains}
+\label{sec:supp_generality}
+
+TIE operates on aligned zero-shot and adapted scores, rather than adapter parameters. We examine the same score-space rule under ordinal and knowledge-preserving adaptation, full fine-tuning, alternative pretrained backbones, and two additional grading domains. Each extension is evaluated within its own training and validation protocol.
+
+\subsection{Ordinal and Knowledge-Preserving Adaptation}
+\label{sec:supp_ordinal_adaptation}
+
+Ordinal prompt learning already uses the structure of the grade space. Yet learning ordered prompts does not directly supervise the missing grades. In the main adapter matrix, TIE raises MS-AUC for OrdinalCLIP-style adaptation by 0.162 on Adience and 0.105 on FairFace. Ordinal representation learning and ordinal displacement transfer address different parts of adaptation.
+
+\begin{table}[!t]
+\centering
+\caption{\textbf{Knowledge preservation and ordinal transfer.}
+Formula-matched KgCoOp under two interior masks and three seeds. The first two columns report uncalibrated KgCoOp minus CoOp. The third is TIE minus KgCoOp MS-AUC. The final column is the independently calibrated TIE minus KgCoOp Missing MAE. Positive MAE differences indicate larger errors. All differences are computed before rounding.}
+\label{tab:supp_kgcoop}
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrrr@{}}
+\toprule
+& \multicolumn{2}{c}{KgCoOp $-$ CoOp}
+& \multicolumn{2}{c}{TIE $-$ KgCoOp} \\
+\cmidrule(lr){2-3}
+\cmidrule(l){4-5}
+Dataset
+& $\Delta$AUC
+& $\Delta$Miss.
+& $\Delta$AUC
+& $\Delta$Miss.$_{\mathrm{Cal}}$ \\
+\midrule
+Adience
+& $+0.011$ & $+0.045$ & $+0.030$ & $+0.067$ \\
+HCI
+& $\mathbf{-0.118}$ & $\mathbf{-0.074}$
+& $+0.157$ & $+0.017$ \\
+FairFace
+& $-0.004$ & $-0.001$
+& $+0.045$ & $+0.214$ \\
+KonIQ
+& $-0.005$ & $-0.013$
+& $+0.055$ & $-0.109$ \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\begin{table*}[!t]
+\centering
+\caption{\textbf{Transfer beyond the primary adapter matrix.}
+TIE minus Adapted, both before calibration, within each extension protocol. $\Delta$AUC denotes MS-AUC; negative MAE differences indicate improvement.
+(a) Alternative pretraining, backbones, and SCUT facial-beauty prediction. (b) DDR severity grading; all nine backbone--adapter settings are shown. DDR values retain four decimal places to preserve the original small differences. Results from different protocols are not pooled.}
+\label{tab:supp_extension_results}
+
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\textbf{(a) Pretraining, backbones, and SCUT}\par
+\smallskip
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}llrr@{}}
+\toprule
+Setting & Adapter
+& $\Delta$AUC$\uparrow$
+& $\Delta$Miss.$\downarrow$ \\
+\midrule
+LAION / Adience & CoOp & $+0.032$ & $-0.511$ \\
+LAION / Adience & OrdinalCLIP & $+0.122$ & $-0.747$ \\
+LAION / HCI & CoOp & $+0.043$ & $-0.189$ \\
+LAION / HCI & OrdinalCLIP & $+0.077$ & $-0.360$ \\
+\midrule
+RN50 / HCI & CoOp & $+0.071$ & $-0.237$ \\
+RN50 / HCI & OrdinalCLIP & $+0.056$ & $-0.283$ \\
+RN50 / HCI & Tip-F & $+0.033$ & $-0.266$ \\
+\midrule
+SCUT-FBP5500 & CoOp & $+0.120$ & $-0.059$ \\
+SCUT-FBP5500 & OrdinalCLIP & $+0.188$ & $-0.083$ \\
+\bottomrule
+\end{tabular*}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\textbf{(b) DDR: three backbones and adapters}\par
+\smallskip
+\footnotesize
+\setlength{\tabcolsep}{1.6pt}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}llrrrr@{}}
+\toprule
+Backbone & Adapter
+& $\Delta$AUC
+& $\Delta$Miss.
+& $\Delta$Seen
+& $\Delta$All \\
+\midrule
+ViT-B/16 & CoOp
+& $-0.0201$ & $-0.2900$ & $+0.2281$ & $+0.0061$ \\
+ViT-B/16 & OrdinalCLIP
+& $-0.0263$ & $-0.3045$ & $+0.2642$ & $+0.0191$ \\
+ViT-B/16 & Tip-F
+& $-0.0255$ & $-0.2905$ & $+0.2331$ & $+0.0072$ \\
+\midrule
+RN50 & CoOp
+& $+0.0070$ & $-0.0455$ & $+0.0053$ & $-0.0163$ \\
+RN50 & OrdinalCLIP
+& $+0.0215$ & $-0.0825$ & $+0.0221$ & $-0.0287$ \\
+RN50 & Tip-F
+& $-0.0109$ & $-0.0454$ & $+0.0089$ & $-0.0149$ \\
+\midrule
+ViT-L/14 & CoOp
+& $-0.0358$ & $-0.0687$ & $+0.0190$ & $-0.0205$ \\
+ViT-L/14 & OrdinalCLIP
+& $-0.0394$ & $-0.0885$ & $+0.0268$ & $-0.0291$ \\
+ViT-L/14 & Tip-F
+& $-0.0310$ & $-0.0686$ & $+0.0249$ & $-0.0187$ \\
+\bottomrule
+\end{tabular*}
+\end{minipage}
+\end{table*}
+
+Knowledge-preserving adaptation provides another comparison. We evaluate a formula-matched KgCoOp implementation~\cite{yao2023kgcoop} with cosine regularization toward hand-crafted text embeddings. This control uses two interior missing-grade masks and three seeds per benchmark. It is distinct from the KgCoOp-style configuration in the main adapter matrix.
+
+Table~\ref{tab:supp_kgcoop} shows a striking result on HCI: KgCoOp reduces Missing MAE relative to CoOp by 0.074, while MS-AUC falls by 0.118. Preserving pretrained knowledge does not necessarily preserve the missing--seen order. Applying TIE to KgCoOp raises MS-AUC on all four tasks, by 0.030--0.157.
+
+The classification results reveal a second distinction. Before calibration, TIE also lowers KgCoOp's Missing MAE on all four tasks. After independent validation calibration, its Missing MAE is higher on Adience, HCI, and FairFace, but lower on KonIQ. FairFace shows the largest reversal: ranking improves by 0.045 while calibrated Missing MAE increases by 0.214. Ordinal transfer changes ranking; calibration determines how that ranking enters full-$K$ decisions.
+
+
+
+A separate NumCLIP~\cite{du2024numclip} HCI experiment provides an interface-level comparison. Its adapted model predicts no missing-grade images in all 18 evaluated conditions. The ported implementation does not provide an aligned zero-shot score reference for the required $S=T+D$ construction, so it is not used as a TIE comparison.
+
+
+
+\subsection{Full Fine-Tuning}
+\label{sec:supp_full_finetuning}
+
+We next examine full fine-tuning of the visual encoder and classification head. Unlike prompt-only adaptation, full fine-tuning changes the visual representation itself. The missing--seen ranking gain from TIE is $-0.0058$ on Adience, $+0.0077$ on HCI, $+0.0098$ on FairFace, and $+0.1987$ on KonIQ.
+
+These results show that the value of transfer depends on the adapted score structure. Full fine-tuning can already improve missing--seen ranking even when missing-grade recall is low. TIE further improves ranking on three benchmarks, but not Adience. With calibration, TIE reduces Missing MAE relative to the simple binary-score control on all four tasks, while Adapted+C remains better on Adience and FairFace. Ranking recovery and calibrated classification performance remain distinct.
+
+\subsection{Pretraining Sources and Backbones}
+\label{sec:supp_pretraining_backbones}
+
+Table~\ref{tab:supp_extension_results}a extends the comparison to LAION-pretrained CLIP~\cite{cherti2023reproducible} and a ResNet-50 backbone. With LAION weights, TIE improves MS-AUC in all four adapter--dataset settings and reduces Missing MAE in all four. On HCI with RN50, the three tested adapters also gain MS-AUC and lower Missing MAE.
+
+The larger ViT-L/14 experiments provide a complementary adaptation diagnostic. Their adapted MS-AUC reaches 0.944, 0.815, 0.808, and 0.596 on Adience, HCI, FairFace, and KonIQ, respectively. Missing-grade recall nevertheless remains zero on HCI and KonIQ. Stronger adapted ranking alone does not guarantee that missing grades are selected by the full classifier.
+
+These experiments span different adaptation contracts. The comparisons in Table~\ref{tab:supp_extension_results} are therefore performed within each protocol, rather than averaged across pretrained sources or backbones.
+
+\subsection{Additional Domains}
+\label{sec:supp_additional_domains}
+
+We evaluate facial-beauty prediction on SCUT-FBP5500~\cite{liang2018scut} using its five official folds. TIE improves MS-AUC by 0.120 with CoOp-style adaptation and 0.188 with OrdinalCLIP-style adaptation. Missing MAE also decreases for both, by 0.059 and 0.083. These results extend displacement transfer to another subjective visual ordinal task.
+
+We further evaluate five-grade diabetic-retinopathy severity on DDR~\cite{li2019ddr}. Table~\ref{tab:supp_extension_results}b reports all nine combinations of three CLIP backbones and three adapters. TIE reduces Missing MAE in every combination, while Seen MAE increases in every combination. MS-AUC improves in two of nine settings, and Overall MAE decreases in six. The medical extension thus shows a different balance between missing-grade recovery and ranking.
+
+DDR uses a content-proxy-group split because patient identifiers are unavailable. The result demonstrates transfer behavior on a medical ordinal task without claiming patient-level independent validation.
+
+Across these extensions, the same score-space operation can be applied after different forms of adaptation. Its effects on ranking and full-$K$ error depend on the learned displacement and the surrounding class competition. This is why the paper evaluates order and calibrated decisions separately.
